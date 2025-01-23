@@ -4,6 +4,26 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome USER</h1>
-</div>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selection Side</title>
+    <link rel="stylesheet" href="~/css/LoginAndCode.css" />
+</head>
+
+<body class="body-Start">
+    <div class="context-container">
+        <a href="Identity/Account/Login" class="card login">
+            <div class="icon">🔒</div>
+            Login
+        </a>
+        <a class="card code_eingabe">
+            <div class="icon">⌨️</div>
+            Code eingeben
+            <input type="text" id="codeInput" name="codeInput" required />
+
+        </a>
+    </div>
+</body>
+</html>
