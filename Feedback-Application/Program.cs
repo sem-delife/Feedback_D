@@ -11,10 +11,11 @@ var connectionString = builder.Configuration.GetConnectionString("FeedbackDb");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Identity registrieren (mit DefaultIdentity oder vollständigem Setup, nicht beides!)
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-    options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.User.RequireUniqueEmail = false; 
+}).AddEntityFrameworkStores<ApplicationDbContext>(); 
 
 // Razor Pages hinzufügen
 builder.Services.AddRazorPages();
