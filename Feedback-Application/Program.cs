@@ -29,7 +29,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts(); // Standard-HSTS-Konfiguration
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); //Https Redirects
 app.UseStaticFiles();
 
 app.UseRouting();
