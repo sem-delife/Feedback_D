@@ -1,14 +1,4 @@
-﻿body-Start {
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background: #eef2f3;
-}
-
-.container {
+﻿.container-Start {
     display: flex;
     justify-content: space-evenly; /* Gleichmäßige Verteilung der Karten */
     align-items: center; /* Vertikale Zentrierung */
