@@ -21,22 +21,6 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 // Razor Pages hinzuf�gen
 builder.Services.AddRazorPages();
 
-public static async Task InitializeRoles(IServiceProvider serviceProvider)
-{
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    string[] roleNames = { "Admin", "Lehrer" };
-
-    foreach (var roleName in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-            Console.WriteLine($"Rolle '{roleName}' wurde erstellt.");
-        }
-    }
-}
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -80,3 +64,20 @@ app.UseAuthorization();
 app.MapRazorPages(); // Razor Pages aktivieren
 
 app.Run();
+
+async Task InitializeRoles(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roleNames = { "Admin", "Lehrer" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+            Console.WriteLine($"Rolle '{roleName}' wurde erstellt.");
+        }
+    }
+}
+

@@ -1,0 +1,23 @@
+@page
+@model CreateLehrerModel
+@{
+    ViewData["Title"] = "Neuen Lehrer hinzufügen";
+}
+
+<h2>Neuen Lehrer hinzufügen</h2>
+
+<form method="post">
+    <div>
+        <label>Email:</label>
+        <input asp-for="Input.Email" />
+        <span asp-validation-for="Input.Email"></span>
+    </div>
+    <div>
+        <label>Passwort:</label>
+        <input asp-for="Input.Password" type="password" />
+        <span asp-validation-for="Input.Password"></span>
+    </div>
+    <button type="submit">Lehrer erstellen</button>
+</form>
+
+<a asp-page="/Admin/AdminDashboard">Zurück zum Dashboard</a>
