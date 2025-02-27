@@ -45,6 +45,18 @@
         </div>
     }
 </div>
+<form method="post" asp-page-handler="SubmitFeedback">
+    <!-- Diese Felder müssen als 'hidden' gesendet werden -->
+    <input type="hidden" name="UserID" id="UserID" />
+    <input type="hidden" name="SelectedClass" id="selectedClass" />
+    <input type="hidden" name="SelectedYear" id="selectedYear" />
+    <input type="hidden" name="SchoolYear" id="schoolYearInput" />
+    <input type="hidden" name="Abteilung" id="AbteilungInput" />
+    <input type="hidden" name="Fach" id="FachInput" />
+    <input type="hidden" name="Code" id="generatedCodeInput" />
+
+    <button hidden type="submit" class="btn btn-primary">Absenden</button>
+</form>
 
 
 
@@ -159,19 +171,20 @@
                 currentStep++;
                 updateStep();
             } else {
-                 // Die Formularfelder aus dem Modal auslesen
-                var UserID = 1;
-                var selectedClass = document.getElementById('classDropdown').value;
-                var selectedYear = document.getElementById('yearDropdown').value;
-                var schoolYear = document.getElementById('schoolYear').value;
-                var abteilung = document.getElementById('Abteilung').value;
-                var fach = document.getElementById('Fach').value;
-                var code = document.getElementById('generatedCode').value;
+                 // Die Formularfelder aus dem Modal auslesen und in die versteckten Felder setzen
+                document.getElementById('UserID').value = 1; 
+                document.getElementById('selectedClass').value = document.getElementById('classDropdown').value;
+                document.getElementById('selectedYear').value = document.getElementById('yearDropdown').value;
+                document.getElementById('schoolYearInput').value = document.getElementById('schoolYear').value;
+                document.getElementById('AbteilungInput').value = document.getElementById('Abteilung').value;
+                document.getElementById('FachInput').value = document.getElementById('Fach').value;
+                document.getElementById('generatedCodeInput').value = document.getElementById('generatedCode').innerText;
+
 
                 const modal = document.getElementById('multiStepModal');
                 const bootstrapModal = bootstrap.Modal.getInstance(modal);
                 bootstrapModal.hide();
-
+                document.querySelector('form').submit();
             }
         });
 
