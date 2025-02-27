@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-
+///
+/// Identity Migration for login and register 
+///
 namespace Feedback_Application.Migrations
 {
     /// <inheritdoc />
