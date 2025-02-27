@@ -46,6 +46,8 @@
     }
 </div>
 
+
+
 <!-- Multi-Step Modal -->
 <div class="modal fade" id="multiStepModal" tabindex="-1" aria-labelledby="multiStepModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -74,16 +76,47 @@
                 <div id="step2" class="modal-step d-none">
                     <h4>Settings</h4>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="setting1">
-                        <label class="form-check-label" for="setting1">Enable Option 1</label>
+                        @* <input class="form-check-input" type="checkbox" id="setting1"> *@
+                        @* <label class="form-check-label" for="setting1">Enable Option 1</label> *@
+                        <label for="classDropdown">Wählen Sie eine Klasse:</label>
+                        <select id="classDropdown" name="selectedClass" class="form-control">
+                            <option value="">Bitte wählen...</option>
+                            <option value="IFA12A">IFA12A</option>
+                            <option value="IFA12B">IFA12B</option>
+                            <option value="IFA12C">IFA12C</option>
+                            <option value="IFS12A">IFS12A</option>
+                            <option value="IFS12B">IFS12B</option>
+                        </select>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="setting2">
-                        <label class="form-check-label" for="setting2">Enable Option 2</label>
+                        @* <input class="form-check-input" type="checkbox" id="setting2"> *@
+                        @* <label class="form-check-label" for="setting2">Enable Option 2</label> *@
+                        <label for="yearDropdown">Wählen Sie eine Jahrgangsstufe:</label>
+                        <select id="yearDropdown" name="selectedYear" class="form-control">
+                            <option value="">Bitte wählen...</option>
+                            @for (int year = DateTime.Now.Year - 4; year <= DateTime.Now.Year; year++)
+                            {
+                                <option value="@year">@year</option>
+                            }
+                        </select>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="setting3">
-                        <label class="form-check-label" for="setting3">Enable Option 3</label>
+                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
+                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
+                        <label for="schoolYear">Geben Sie das Schuljahr ein:</label>
+                        <input type="number" id="schoolYear" name="schoolYear" class="form-control" placeholder="z.B. 2025" required />
+                    </div>
+                    <div class="form-check">
+                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
+                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
+                        <label for="Abteilung">Geben Sie die Abteilung ein:</label>
+                        <input type="text" id="Abteilung" name="Abteilung" class="form-control" placeholder="z.B. IT" required />
+                    </div>
+                    <div class="form-check">
+                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
+                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
+                        <label for="Fach">Geben Sie die Abteilung ein:</label>
+                        <input type="text" id="Fach" name="Fach" class="form-control" placeholder="z.B. AWP" required />
                     </div>
                 </div>
 
@@ -126,9 +159,19 @@
                 currentStep++;
                 updateStep();
             } else {
+                 // Die Formularfelder aus dem Modal auslesen
+                var UserID = 1;
+                var selectedClass = document.getElementById('classDropdown').value;
+                var selectedYear = document.getElementById('yearDropdown').value;
+                var schoolYear = document.getElementById('schoolYear').value;
+                var abteilung = document.getElementById('Abteilung').value;
+                var fach = document.getElementById('Fach').value;
+                var code = document.getElementById('generatedCode').value;
+
                 const modal = document.getElementById('multiStepModal');
                 const bootstrapModal = bootstrap.Modal.getInstance(modal);
                 bootstrapModal.hide();
+
             }
         });
 
