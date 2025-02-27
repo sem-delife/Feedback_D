@@ -1,0 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+[Authorize(Roles = "Lehrer,Admin")]
+public class LehrerDashboardModel : PageModel
+{
+    public void OnGet()
+    {
+    }
+}

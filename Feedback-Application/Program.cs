@@ -4,10 +4,10 @@ using Feedback_Application.Areas.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ConnectionString für MySQL holen
+// ConnectionString fï¿½r MySQL holen
 var connectionString = builder.Configuration.GetConnectionString("FeedbackDb");
 
-// DbContext für MySQL registrieren
+// DbContext fï¿½r MySQL registrieren
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -18,21 +18,40 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
 
-// Razor Pages hinzufügen
+// Razor Pages hinzufï¿½gen
 builder.Services.AddRazorPages();
+
+public static async Task InitializeRoles(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] roleNames = { "Admin", "Lehrer" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+            Console.WriteLine($"Rolle '{roleName}' wurde erstellt.");
+        }
+    }
+}
 
 var app = builder.Build();
 
-
-
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate(); // Wendet ausstehende Migrations automatisch an
+}
 
 // Testabfrage nach dem Aufbau der Anwendung
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // Test-Select für die Tabelle 'Rolle' durchführen
-    var rollen = dbContext.Rolle.ToList(); // Alle Einträge aus der Tabelle 'Rolle'
+    // Test-Select fï¿½r die Tabelle 'Rolle' durchfï¿½hren
+    var rollen = dbContext.Rolle.ToList(); // Alle Eintrï¿½ge aus der Tabelle 'Rolle'
 
     Console.WriteLine($"Gefundene Rollen: {rollen.Count}");
     foreach (var rolle in rollen)
