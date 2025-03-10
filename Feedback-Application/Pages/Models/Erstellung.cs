@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Feedback_Application.Pages.Models
 {
@@ -7,13 +8,17 @@ namespace Feedback_Application.Pages.Models
         [Key]
         public int FeedbackID { get; set; } // Primärschlüssel, Auto-Increment
         [Required]
-        public int? UserID { get; set; } // Benutzer ID, optional (nullable)
+        [ForeignKey("AspNetUsers")]
+        public int? UserID { get; set; } // Benutzer ID, optional (nullable)    
+        [ForeignKey("Klassen")]
+        public int KlassenID { get; set; } // KlassenID
+        [ForeignKey("Abteilung")]
+        public int AbteilungsID { get; set; } // Abteilung, optional
+        [ForeignKey("Fach")]
+        public int FachID { get; set; } // Fach, optional
         public string Code { get; set; } // Code, optional
-        public string KlassenName { get; set; } // Klassenname, optional
         public int? Jahrgang { get; set; } // Jahrgang, optional
         public int Schuljahr { get; set; } // Schuljahr, optional
-        public string Abteilung { get; set; } // Abteilung, optional
-        public string Fach { get; set; } // Fach, optional
 
         // Konstruktor (optional, aber hilfreich)
         public Erstellung()

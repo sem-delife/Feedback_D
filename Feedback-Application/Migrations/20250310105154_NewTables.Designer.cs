@@ -4,6 +4,7 @@ using Feedback_Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310105154_NewTables")]
+    partial class NewTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,74 +40,6 @@ namespace Feedback_Application.Migrations
                     b.HasKey("AbteilungsID");
 
                     b.ToTable("Abteilung");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Aussagen", b =>
-                {
-                    b.Property<int>("AussageID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AussageID"));
-
-                    b.Property<string>("Aussage")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("ThemaID")
-                        .HasColumnType("int");
-
-                    b.HasKey("AussageID");
-
-                    b.ToTable("Aussagen");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Bewertungen", b =>
-                {
-                    b.Property<int>("BewertungsID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BewertungsID"));
-
-                    b.Property<string>("BewertungsChar")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("BewertungsInt")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BogenID")
-                        .HasColumnType("int");
-
-                    b.HasKey("BewertungsID");
-
-                    b.ToTable("Bewertungen");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Ergebnisse", b =>
-                {
-                    b.Property<int>("ErgebnisID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ErgebnisID"));
-
-                    b.Property<int>("AussageID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BewertungsID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FeedbackID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VarErgebnisID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ErgebnisID");
-
-                    b.ToTable("Ergebnisse");
                 });
 
             modelBuilder.Entity("Feedback_Application.Pages.Models.Erstellung", b =>
@@ -143,26 +78,6 @@ namespace Feedback_Application.Migrations
                     b.ToTable("Erstellung");
                 });
 
-            modelBuilder.Entity("Feedback_Application.Pages.Models.ExtraFeedback", b =>
-                {
-                    b.Property<int>("FragenID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("FragenID"));
-
-                    b.Property<int>("BogenID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Frage")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("FragenID");
-
-                    b.ToTable("ExtraFeedback");
-                });
-
             modelBuilder.Entity("Feedback_Application.Pages.Models.Fach", b =>
                 {
                     b.Property<int>("FachID")
@@ -180,23 +95,6 @@ namespace Feedback_Application.Migrations
                     b.ToTable("Fach");
                 });
 
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Feedbackbogen", b =>
-                {
-                    b.Property<int>("BogenID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BogenID"));
-
-                    b.Property<string>("Beschreibung")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("BogenID");
-
-                    b.ToTable("Feedbackbogen");
-                });
-
             modelBuilder.Entity("Feedback_Application.Pages.Models.Klassen", b =>
                 {
                     b.Property<int>("KlassenID")
@@ -212,49 +110,6 @@ namespace Feedback_Application.Migrations
                     b.HasKey("KlassenID");
 
                     b.ToTable("Klassen");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Oberthema", b =>
-                {
-                    b.Property<int>("ThemaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("ThemaID"));
-
-                    b.Property<int>("BogenID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Thema")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("ThemaID");
-
-                    b.ToTable("Oberthema");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Variable_Ergebnisse", b =>
-                {
-                    b.Property<int>("VarErgebnisID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VarErgebnisID"));
-
-                    b.Property<string>("AntwortUser")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("FeedbackID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FragenID")
-                        .HasColumnType("int");
-
-                    b.HasKey("VarErgebnisID");
-
-                    b.ToTable("Variable_Ergebnisse");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

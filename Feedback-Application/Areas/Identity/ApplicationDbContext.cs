@@ -11,7 +11,19 @@ namespace Feedback_Application
             : base(options)
         { }
 
+        public DbSet<Feedbackbogen> Feedbackbogen { get; set; }
+        public DbSet<Oberthema> Oberthema { get; set; }
+        public DbSet<Aussagen> Aussagen { get; set; }
+        public DbSet<Bewertungen> Bewertungen { get; set; }
+        public DbSet<ExtraFeedback> ExtraFeedback { get; set; }
+        public DbSet<Fach> Fach { get; set; }
+        public DbSet<Abteilung> Abteilung { get; set; }
+        public DbSet<Klassen> Klassen { get; set; }
         public DbSet<Erstellung> Erstellung { get; set; }
+        public DbSet<Variable_Ergebnisse> Variable_Ergebnisse { get; set; }
+        public DbSet<Ergebnisse> Ergebnisse { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -173,11 +173,11 @@
             } else {
                  // Die Formularfelder aus dem Modal auslesen und in die versteckten Felder setzen
                 document.getElementById('UserID').value = 1;
-                document.getElementById('selectedClass').value = document.getElementById('classDropdown').value;
+                document.getElementById('selectedClass').value = 0;//document.getElementById('classDropdown').value
                 document.getElementById('selectedYear').value = document.getElementById('yearDropdown').value;
                 document.getElementById('schoolYearInput').value = document.getElementById('schoolYear').value;
-                document.getElementById('AbteilungInput').value = document.getElementById('Abteilung').value;
-                document.getElementById('FachInput').value = document.getElementById('Fach').value;
+                document.getElementById('AbteilungInput').value = 0;//document.getElementById('Abteilung').value
+                document.getElementById('FachInput').value = 0;//document.getElementById('Fach').value
                 document.getElementById('generatedCodeInput').value = document.getElementById('generatedCode').innerText;
 
 

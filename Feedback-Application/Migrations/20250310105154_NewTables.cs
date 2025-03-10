@@ -7,12 +7,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Feedback_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class FixMySQLSyntax : Migration
+    public partial class NewTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Abteilung",
+                columns: table => new
+                {
+                    AbteilungsID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    AbteilungName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Abteilung", x => x.AbteilungsID);
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -76,20 +91,47 @@ namespace Feedback_Application.Migrations
                     FeedbackID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserID = table.Column<int>(type: "int", nullable: false),
+                    KlassenID = table.Column<int>(type: "int", nullable: false),
+                    AbteilungsID = table.Column<int>(type: "int", nullable: false),
+                    FachID = table.Column<int>(type: "int", nullable: false),
                     Code = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    KlassenName = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Jahrgang = table.Column<int>(type: "int", nullable: true),
-                    Schuljahr = table.Column<int>(type: "int", nullable: false),
-                    Abteilung = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Fach = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    Schuljahr = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Erstellung", x => x.FeedbackID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Fach",
+                columns: table => new
+                {
+                    FachID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FachName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fach", x => x.FachID);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Klassen",
+                columns: table => new
+                {
+                    KlassenID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    KlassenName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Klassen", x => x.KlassenID);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -262,6 +304,9 @@ namespace Feedback_Application.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Abteilung");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -278,6 +323,12 @@ namespace Feedback_Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "Erstellung");
+
+            migrationBuilder.DropTable(
+                name: "Fach");
+
+            migrationBuilder.DropTable(
+                name: "Klassen");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
