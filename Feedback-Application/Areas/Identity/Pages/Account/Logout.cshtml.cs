@@ -15,50 +15,28 @@ namespace Feedback_Application.Areas.Identity.Pages.Account
 {
     public class LogoutModel : PageModel
     {
+        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
 
-        public LogoutModel(ILogger<LogoutModel> logger)
+        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger)
         {
+            _signInManager = signInManager;
             _logger = logger;
         }
-        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
+
+        public async Task<IActionResult> OnPost(string returnUrl = null)
         {
-            try
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            if (returnUrl != null)
             {
-                _logger.LogInformation("Logout attempt started.");
-
-                // Logge den Benutzer aus
-                await HttpContext.SignOutAsync();
-
-                _logger.LogInformation("User has been logged out.");
-
-                // Weiterleitung zur Startseite oder zu einer bestimmten URL
-                return Redirect(returnUrl ?? "/Index");
+                return LocalRedirect(returnUrl);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError($"Logout failed: {ex.Message}");
-                return RedirectToPage("/Error"); // Fehlerseite
-            }
-        }
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
-        {
-            try
-            {
-                _logger.LogInformation("Logout attempt started.");
-
-                // Logge den Benutzer aus
-                await HttpContext.SignOutAsync();
-
-                _logger.LogInformation("User has been logged out.");
-
-                // Weiterleitung zur Startseite oder zu einer bestimmten URL
-                return RedirectToPage(returnUrl ?? "/Index");
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError($"Logout failed: {ex.Message}");
-                return RedirectToPage("/Error"); // Fehlerseite
+                // This needs to be a redirect so that the browser performs a new
+                // request and the identity for the user gets updated.
+                return RedirectToPage();
             }
         }
     }
