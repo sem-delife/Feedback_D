@@ -17,15 +17,15 @@ public class IndexModel : PageModel
     public int UserID { get; set; }
 
     [BindProperty]
-    public string SelectedClass { get; set; }
+    public int SelectedClass { get; set; }
     [BindProperty]
     public int SelectedYear { get; set; }
     [BindProperty]
     public int SchoolYear { get; set; }
     [BindProperty]
-    public string Abteilung { get; set; }
+    public int Abteilung { get; set; }
     [BindProperty]
-    public string Fach { get; set; }
+    public int Fach { get; set; }
     [BindProperty]
     public string Code { get; set; }
 
@@ -37,11 +37,11 @@ public class IndexModel : PageModel
             var erstellt = new Erstellung
             {
                 UserID = UserID,
-                KlassenName = SelectedClass,
+                KlassenID = SelectedClass,
                 Jahrgang = SelectedYear,
                 Schuljahr = SchoolYear,
-                Abteilung = Abteilung,
-                Fach = Fach,
+                AbteilungsID = Abteilung,
+                FachID = Fach,
                 Code = Code
             };
 
