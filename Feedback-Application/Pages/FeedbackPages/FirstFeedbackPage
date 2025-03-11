@@ -1,0 +1,108 @@
+@page
+@model FeedbackModel
+@{
+    ViewData["Title"] = "Feedbackbogen 1";
+}
+
+<h2>Feedbackbogen</h2>
+
+@if (Model.Submitted)
+{
+    <h3>Danke für Ihr Feedback!</h3>
+    <p>Ihre Antworten wurden erfolgreich übermittelt.</p>
+}
+else
+{
+    <form method="post">
+        <h3>Verhalten des Lehrers</h3>
+        @foreach (var question in Model.TeacherBehaviorQuestions)
+        {
+            <label>@question</label>
+            <div>
+                @foreach (var option in Model.Options)
+                {
+                    <input type="radio" name="@question" value="@option" required> @option
+                }
+            </div>
+        }
+
+        <h3>Wie ist der Unterricht?</h3>
+        @foreach (var question in Model.TeachingQuestions)
+        {
+            <label>@question</label>
+            <div>
+                @foreach (var option in Model.Options)
+                {
+                    <input type="radio" name="@question" value="@option" required> @option
+                }
+            </div>
+        }
+
+        <h3>Weitere Fragen</h3>
+        @foreach (var question in Model.OtherQuestions)
+        {
+            <label>@question</label>
+            <div>
+                @foreach (var option in Model.Options)
+                {
+                    <input type="radio" name="@question" value="@option" required> @option
+                }
+            </div>
+        }
+
+        <h3>Freitext</h3>
+        <label>Das hat mir besonders gut gefallen:</label>
+        <textarea name="PositiveFeedback" rows="3"></textarea>
+
+        <label>Das hat mir nicht gefallen:</label>
+        <textarea name="NegativeFeedback" rows="3"></textarea>
+
+        <label>Verbesserungsvorschläge:</label>
+        <textarea name="Suggestions" rows="3"></textarea>
+
+        <button type="submit">Absenden</button>
+    </form>
+}
+
+@code {
+    public class FeedbackModel : PageModel
+    {
+        public List<string> TeacherBehaviorQuestions { get; } = new()
+        {
+            "Der Lehrer ist ungeduldig",
+            "Der Lehrer ist sicher im Auftreten",
+            "Der Lehrer ist freundlich",
+            "Der Lehrer ist aufbrausend",
+            "Der Lehrer ist tatkräftig",
+            "Der Lehrer ist aufgeschlossen"
+        };
+        
+        public List<string> TeachingQuestions { get; } = new()
+        {
+            "Die Ziele des Unterrichts sind klar erkennbar",
+            "Der Lehrer redet zu viel",
+            "Der Lehrer schweift oft vom Thema ab",
+            "Die Sprache des Lehrers ist gut verständlich",
+            "Der Unterricht ist abwechslungsreich",
+            "Der Stoff wird ausreichend wiederholt"
+        };
+        
+        public List<string> OtherQuestions { get; } = new()
+        {
+            "Die Themen der Schulaufgaben werden rechtzeitig vorher bekannt gegeben",
+            "Die Bewertungen sind nachvollziehbar"
+        };
+        
+        public List<string> Options { get; } = new()
+        {
+            "Trifft völlig zu", "Trifft eher zu", "Trifft eher nicht zu", "Trifft überhaupt nicht zu"
+        };
+        
+        public bool Submitted { get; set; } = false;
+        
+        public void OnPost()
+        {
+            Submitted = true;
+        }
+    }
+}
