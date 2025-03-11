@@ -11,6 +11,7 @@ namespace Feedback_Application
             : base(options)
         { }
 
+        public DbSet<Registrierung> Registrierung { get; set; }
         public DbSet<Feedbackbogen> Feedbackbogen { get; set; }
         public DbSet<Oberthema> Oberthema { get; set; }
         public DbSet<Aussagen> Aussagen { get; set; }
