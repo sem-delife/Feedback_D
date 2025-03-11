@@ -1,17 +1,9 @@
-#nullable disable
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
+ï»¿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 
 namespace Feedback_Application.Areas.Identity.Pages.Account
 {
@@ -39,8 +31,8 @@ namespace Feedback_Application.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [Display(Name = "Username")] // Anzeige für den Benutzernamen
-            public string Username { get; set; } // Ändere von "Email" zu "Username"
+            [Display(Name = "Username")] // Anzeige fÃ¼r den Benutzernamen
+            public string Username { get; set; } // Ã„ndere von "Email" zu "Username"
 
             [Required]
             [DataType(DataType.Password)]

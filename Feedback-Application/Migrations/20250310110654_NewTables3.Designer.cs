@@ -4,6 +4,7 @@ using Feedback_Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250310110654_NewTables3")]
+    partial class NewTables3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,23 +235,6 @@ namespace Feedback_Application.Migrations
                     b.HasKey("ThemaID");
 
                     b.ToTable("Oberthema");
-                });
-
-            modelBuilder.Entity("Feedback_Application.Pages.Models.Registrierung", b =>
-                {
-                    b.Property<int>("RegID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RegID"));
-
-                    b.Property<string>("RegPasswort")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("RegID");
-
-                    b.ToTable("Registrierung");
                 });
 
             modelBuilder.Entity("Feedback_Application.Pages.Models.Variable_Ergebnisse", b =>

@@ -1,11 +1,18 @@
 ﻿@page
-@model LoginModel
-
+@model Feedback_Application.Areas.Identity.Pages.Account.LoginModel
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Login";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h2>@ViewData["Title"]</h2>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @Model.ErrorMessage
+    </div>
+}
+
 <div class="row">
     <div class="col-md-4">
         <section>
@@ -44,10 +51,5 @@
         </section>
     </div>
     <div class="col-md-6 col-md-offset-2">
-        
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

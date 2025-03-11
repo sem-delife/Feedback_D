@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Feedback_Application.Areas.Identity;
+using Microsoft.AspNetCore.Identity;
+using Feedback_Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,73 +11,34 @@ var connectionString = builder.Configuration.GetConnectionString("FeedbackDb");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+// Identity-Registrierung mit DefaultIdentity
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.User.RequireUniqueEmail = false;
-}).AddEntityFrameworkStores<ApplicationDbContext>();
-
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Razor Pages hinzuf�gen
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate(); // Wendet ausstehende Migrations automatisch an
-}
-
-// Testabfrage nach dem Aufbau der Anwendung
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-    // Test-Select f�r die Tabelle 'Rolle' durchf�hren
-    var rollen = dbContext.Rolle.ToList(); // Alle Eintr�ge aus der Tabelle 'Rolle'
-
-    Console.WriteLine($"Gefundene Rollen: {rollen.Count}");
-    foreach (var rolle in rollen)
-    {
-        Console.WriteLine($"RollenID: {rolle.RollenID}, Rolle: {rolle.Rolle}");
-    }
-}
-
-
-
 // HTTP-Request-Pipeline konfigurieren
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    app.UseHsts(); // Standard-HSTS-Konfiguration
+    app.UseHsts();
 }
 
-app.UseHttpsRedirection(); //Https Redirects
+app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
-app.UseAuthentication(); // Identity-Authentifizierung aktivieren
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages(); // Razor Pages aktivieren
+app.MapRazorPages();
+app.MapControllers(); // WICHTIG f�r Identity-Routen
 
 app.Run();
-
-async Task InitializeRoles(IServiceProvider serviceProvider)
-{
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    string[] roleNames = { "Admin", "Lehrer" };
-
-    foreach (var roleName in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-            Console.WriteLine($"Rolle '{roleName}' wurde erstellt.");
-        }
-    }
-}
-
