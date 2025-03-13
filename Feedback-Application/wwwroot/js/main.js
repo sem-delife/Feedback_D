@@ -8,6 +8,7 @@ function generateUniqueCode() {
         code += characters[randomIndex];
     }
     generatedCodeValue = code; // Speichert den generierten Code in der Variable
+    
     return code;
 }
 
