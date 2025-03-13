@@ -71,12 +71,10 @@ public class IndexModel : PageModel
             _context.Erstellung.Add(erstellt);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine("Feedback erfolgreich in DB gespeichert.");
             return RedirectToPage("/Index");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fehler beim Speichern: {ex.Message}");
             return Page();
         }
     }
