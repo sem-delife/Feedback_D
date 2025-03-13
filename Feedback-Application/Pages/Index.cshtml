@@ -106,17 +106,23 @@
                         <label for="yearDropdown">Wählen Sie eine Jahrgangsstufe:</label>
                         <select id="yearDropdown" name="selectedYear" class="form-control">
                             <option value="">Bitte wählen...</option>
+                        
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+
+                         
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <label for="schoolYear">Wählen Sie ein Schuljahr:</label>
+                        <select id="schoolYear" name="SelectedSchoolYear" class="form-control">
+                            <option value="">Bitte wählen...</option>
                             @for (int year = DateTime.Now.Year - 4; year <= DateTime.Now.Year; year++)
                             {
                                 <option value="@year">@year</option>
                             }
                         </select>
-                    </div>
-                    <div class="form-check">
-                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
-                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
-                        <label for="schoolYear">Geben Sie das Schuljahr ein:</label>
-                        <input type="number" id="schoolYear" name="schoolYear" class="form-control" placeholder="z.B. 2025" required />
                     </div>
                     <div class="form-check">
                         <label for="Abteilung">Wählen Sie eine Abteilung:</label>
@@ -148,7 +154,6 @@
             <div class="modal-footer">
                 <button type="button" id="prevBtn" class="btn btn-secondary d-none">Back</button>
                 <button type="button" id="nextBtn" class="btn btn-primary">Next</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -180,15 +185,24 @@
                 currentStep++;
                 updateStep();
             } else {
-                 // Die Formularfelder aus dem Modal auslesen und in die versteckten Felder setzen
-                document.getElementById('UserID').value = 1;
-                document.getElementById('selectedClass').value = 0;//document.getElementById('classDropdown').value
-                document.getElementById('selectedYear').value = document.getElementById('yearDropdown').value;
+                // Fülle die versteckten Felder aus den Dropdown-Werten
+                document.getElementById('UserID').value = 1; // Oder dynamisch aus der Authentifizierung setzen
+                document.getElementById('selectedClass').value = document.getElementById('classDropdown').value;
+                document.getElementById('selectedYear').value = document.getElementById('Jahrgang').value;
                 document.getElementById('schoolYearInput').value = document.getElementById('schoolYear').value;
-                document.getElementById('AbteilungInput').value = 0;//document.getElementById('Abteilung').value
-                document.getElementById('FachInput').value = 0;//document.getElementById('Fach').value
+                document.getElementById('AbteilungInput').value = document.getElementById('Abteilung').value;
+                document.getElementById('FachInput').value = document.getElementById('Fach').value;
                 document.getElementById('generatedCodeInput').value = document.getElementById('generatedCode').innerText;
 
+                console.log("Submitting form with values: ", {
+                    UserID: document.getElementById('UserID').value,
+                    SelectedClass: document.getElementById('selectedClass').value,
+                    SelectedYear: document.getElementById('selectedYear').value,
+                    SchoolYear: document.getElementById('schoolYearInput').value,
+                    Abteilung: document.getElementById('AbteilungInput').value,
+                    Fach: document.getElementById('FachInput').value,
+                    Code: document.getElementById('generatedCodeInput').value
+                });
 
                 const modal = document.getElementById('multiStepModal');
                 const bootstrapModal = bootstrap.Modal.getInstance(modal);
