@@ -2,7 +2,11 @@ using Feedback_Application.Pages.Models;
 using Feedback_Application;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using Feedback_Application.Areas.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class IndexModel : PageModel
 {
@@ -13,6 +17,7 @@ public class IndexModel : PageModel
     {
         _context = context;
     }
+
     [BindProperty]
     public int UserID { get; set; }
 
@@ -29,7 +34,27 @@ public class IndexModel : PageModel
     [BindProperty]
     public string Code { get; set; }
 
-    // Diese Methode wird beim Absenden des Formulars aufgerufen
+    public List<SelectListItem> KlassenList { get; set; }
+    public List<SelectListItem> FachList { get; set; }
+    public List<SelectListItem> AbteilungList { get; set; }
+
+    public async Task<IActionResult> OnGetAsync()
+    {
+        KlassenList = await _context.Klassen
+            .Select(k => new SelectListItem { Value = k.KlassenID.ToString(), Text = k.KlassenName })
+            .ToListAsync();
+
+        FachList = await _context.Fach
+            .Select(f => new SelectListItem { Value = f.FachID.ToString(), Text = f.FachName })
+            .ToListAsync();
+
+        AbteilungList = await _context.Abteilung
+            .Select(a => new SelectListItem { Value = a.AbteilungsID.ToString(), Text = a.AbteilungName })
+            .ToListAsync();
+
+        return Page();
+    }
+
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
     {
         try
