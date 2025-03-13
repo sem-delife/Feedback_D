@@ -1,62 +1,37 @@
 using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Feedback_Application.Areas.Admin.Pages.Shared;  // Für das AdminPanelModel
+using Microsoft.EntityFrameworkCore;
 using Feedback_Application.Pages.Models;
+using Feedback_Application.Areas.Identity.Pages.Account.Manage.Models;
 
 namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ApplicationDbContext _context;
 
-        public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
-            ApplicationDbContext context)
+        public IndexModel(UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _context = context;
-            AdminPanel = new AdminPanelModel();
         }
 
-        // Profildaten und Admin Panel Model
         public string Username { get; set; }
-        [TempData]
-        public string StatusMessage { get; set; }
-        [BindProperty]
-        public InputModel Input { get; set; }
+        [TempData] public string StatusMessage { get; set; }
 
-        // Admin Panel (Lehrer-Code)
-        public AdminPanelModel AdminPanel { get; set; } = new AdminPanelModel();
+        [BindProperty] public string TeacherCode { get; set; }
 
-        public class InputModel
-        {
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
+        [BindProperty] public string EntityType { get; set; }
+        [BindProperty] public string EntityName { get; set; }
+        [BindProperty] public int EntityId { get; set; }
 
-        // Laden der Profildaten
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+        public List<AdminDataTableViewModel> DataTables { get; set; } = new();
 
-            Username = userName;
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
-
-        // Laden der Admin-Daten (Lehrer-Code)
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -65,78 +40,153 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            Username = user.UserName;
+            var registrationEntry = await _context.Registrierung.FindAsync(1);
+            TeacherCode = registrationEntry?.RegPasswort ?? "";
 
-            // Admin Panel mit Lehrer-Code laden
-            AdminPanel = new AdminPanelModel();
-            await AdminPanel.LoadDataAsync(_context);
-
-            return Page(); // WICHTIG: Eine IActionResult-Rückgabe ist erforderlich
-        }
-
-
-
-        // Aktualisieren der Profil- und Admin-Daten
-        public async Task<IActionResult> OnPostAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            DataTables = new List<AdminDataTableViewModel>
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
-            }
-
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                new AdminDataTableViewModel
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
+                    Title = "Klassen",
+                    Items = await _context.Klassen.Cast<object>().ToListAsync(),
+                    NameField = "KlassenName",
+                    IdField = "KlassenID"
+                },
+                new AdminDataTableViewModel
+                {
+                    Title = "Fächer",
+                    Items = await _context.Fach.Cast<object>().ToListAsync(),
+                    NameField = "FachName",
+                    IdField = "FachID"
+                },
+                new AdminDataTableViewModel
+                {
+                    Title = "Abteilungen",
+                    Items = await _context.Abteilung.Cast<object>().ToListAsync(),
+                    NameField = "AbteilungName",
+                    IdField = "AbteilungID"
                 }
-            }
+            };
 
-
-            // Speichern des Lehrer-Codes
-            await AdminPanel.SaveDataAsync(_context);
-
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            return Page();
         }
 
-        public async Task<IActionResult> OnPostAdminPanelAsync([FromForm] string TeacherCode)
+        public async Task<IActionResult> OnPostAddEntityAsync()
         {
-            Console.WriteLine("OnPostAdminPanelAsync wurde aufgerufen!");
-
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(EntityName))
             {
-                Console.WriteLine("ModelState ist ungültig!");
-                await LoadAsync(await _userManager.GetUserAsync(User));
+                ModelState.AddModelError("", "Der Name darf nicht leer sein.");
                 return Page();
             }
 
-            // Sicherstellen, dass AdminPanel existiert
-            if (AdminPanel == null)
+            if (EntityType == "Klassen")
             {
-                AdminPanel = new AdminPanelModel();
+                _context.Klassen.Add(new Klassen { KlassenName = EntityName });
+            }
+            else if (EntityType == "Fächer")
+            {
+                _context.Fach.Add(new Fach { FachName = EntityName });
+            }
+            else if (EntityType == "Abteilungen")
+            {
+                _context.Abteilung.Add(new Abteilung { AbteilungName = EntityName });
+            }
+            else
+            {
+                ModelState.AddModelError("", "Ungültiger Typ.");
+                return Page();
             }
 
-            Console.WriteLine($"Neuer Lehrer-Code: {TeacherCode}");
-
-            // Lehrer-Code setzen und speichern
-            AdminPanel.TeacherCode = TeacherCode;
-            await AdminPanel.SaveDataAsync(_context);
-
-            StatusMessage = "Lehrer-Code wurde erfolgreich aktualisiert!";
+            await _context.SaveChangesAsync();
             return RedirectToPage();
         }
 
+        public async Task<IActionResult> OnPostEditEntityAsync()
+        {
+            if (EntityId <= 0 || string.IsNullOrWhiteSpace(EntityName))
+            {
+                ModelState.AddModelError("", "Ungültige Eingabe.");
+                return Page();
+            }
+
+            try
+            {
+                if (EntityType == "Klassen")
+                {
+                    var entity = await _context.Klassen.FindAsync(EntityId);
+                    if (entity != null)
+                    {
+                        entity.KlassenName = EntityName;
+                        _context.Klassen.Update(entity);
+                    }
+                }
+                else if (EntityType == "Fächer")
+                {
+                    var entity = await _context.Fach.FindAsync(EntityId);
+                    if (entity != null)
+                    {
+                        entity.FachName = EntityName;
+                        _context.Fach.Update(entity);
+                    }
+                }
+                else if (EntityType == "Abteilungen")
+                {
+                    var entity = await _context.Abteilung.FindAsync(EntityId);
+                    if (entity != null)
+                    {
+                        entity.AbteilungName = EntityName;
+                        _context.Abteilung.Update(entity);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Ungültiger Typ.");
+                    return Page();
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToPage();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Fehler beim Bearbeiten: " + ex.Message);
+                return Page();
+            }
+        }
+
+
+        public async Task<IActionResult> OnPostDeleteEntityAsync(int entityId, string entityType)
+        {
+            if (entityId <= 0 || string.IsNullOrWhiteSpace(entityType))
+            {
+                return BadRequest("Ungültige Anfrage.");
+            }
+
+            object entity = null;
+
+            if (entityType == "Klassen")
+            {
+                entity = await _context.Klassen.FindAsync(entityId);
+                if (entity != null) _context.Klassen.Remove((Klassen)entity);
+            }
+            else if (entityType == "Fächer")
+            {
+                entity = await _context.Fach.FindAsync(entityId);
+                if (entity != null) _context.Fach.Remove((Fach)entity);
+            }
+            else if (entityType == "Abteilungen")
+            {
+                entity = await _context.Abteilung.FindAsync(entityId);
+                if (entity != null) _context.Abteilung.Remove((Abteilung)entity);
+            }
+
+            if (entity != null)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToPage();
+        }
     }
 }

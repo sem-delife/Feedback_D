@@ -56,7 +56,6 @@ namespace Feedback_Application
                 entity.Property(e => e.ClaimValue).HasColumnType("longtext");
             });
 
-            Console.WriteLine("Kill me pls");
         }
 
 

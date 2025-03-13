@@ -1,0 +1,44 @@
+﻿@model Feedback_Application.Areas.Identity.Pages.Account.Manage.Models.AdminDataTableViewModel
+
+<h3>@Model.Title</h3>
+
+<!-- Button zum Hinzufügen -->
+<button class="btn btn-success mb-3" onclick="setEntityTypeAndShowModal('@Model.Title')">Hinzufügen</button>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            var type = item.GetType();
+            var nameValue = type.GetProperty(Model.NameField)?.GetValue(item, null);
+            var idValue = type.GetProperty(Model.IdField)?.GetValue(item, null);
+
+            <tr>
+                <td>@nameValue</td>
+                <td>@idValue</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="EntityId" value="@idValue" />
+                        <input type="hidden" name="EntityType" value="@Model.Title" />
+
+                        <button type="button" class="btn btn-warning btn-sm"
+                                onclick="setEditEntity('@idValue', '@nameValue', '@Model.Title')">
+                            Bearbeiten
+                        </button>
+                        <button type="submit" class="btn btn-danger btn-sm" asp-page-handler="DeleteEntity"
+                                onclick="return confirm('Willst du das wirklich löschen?');">
+                            Löschen
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
