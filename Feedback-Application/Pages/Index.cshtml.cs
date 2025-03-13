@@ -1,16 +1,18 @@
 using Feedback_Application.Pages.Models;
+using Feedback_Application;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Feedback_Application;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
 
+    // Konstruktor, um den DbContext zu injizieren
     public IndexModel(ApplicationDbContext context)
     {
         _context = context;
@@ -21,38 +23,38 @@ public class IndexModel : PageModel
 
     [BindProperty]
     public int SelectedClass { get; set; }
-
     [BindProperty]
     public int SelectedYear { get; set; }
-
     [BindProperty]
     public int SchoolYear { get; set; }
-
     [BindProperty]
     public int Abteilung { get; set; }
-
     [BindProperty]
     public int Fach { get; set; }
-
     [BindProperty]
     public string Code { get; set; }
 
-    // Liste für das Dropdown-Menü
-    public List<SelectListItem> KlassenListe { get; set; }
+    public List<SelectListItem> KlassenList { get; set; }
+    public List<SelectListItem> FachList { get; set; }
+    public List<SelectListItem> AbteilungList { get; set; }
 
-    // Lädt die verfügbaren Klassen beim Seitenaufruf
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
-        KlassenListe = _context.Klassen
-            .Select(k => new SelectListItem
-            {
-                Value = k.KlassenID.ToString(),
-                Text = k.KlassenName
-            })
-            .ToList();
+        KlassenList = await _context.Klassen
+            .Select(k => new SelectListItem { Value = k.KlassenID.ToString(), Text = k.KlassenName })
+            .ToListAsync();
+
+        FachList = await _context.Fach
+            .Select(f => new SelectListItem { Value = f.FachID.ToString(), Text = f.FachName })
+            .ToListAsync();
+
+        AbteilungList = await _context.Abteilung
+            .Select(a => new SelectListItem { Value = a.AbteilungsID.ToString(), Text = a.AbteilungName })
+            .ToListAsync();
+
+        return Page();
     }
 
-    // Diese Methode wird beim Absenden des Formulars aufgerufen
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
     {
         try
@@ -71,10 +73,12 @@ public class IndexModel : PageModel
             _context.Erstellung.Add(erstellt);
             await _context.SaveChangesAsync();
 
+            Console.WriteLine("Feedback erfolgreich in DB gespeichert.");
             return RedirectToPage("/Index");
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Fehler beim Speichern: {ex.Message}");
             return Page();
         }
     }
