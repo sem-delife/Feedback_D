@@ -1,11 +1,14 @@
 using Feedback_Application;
-using Feedback_Application.Pages.Models; // Namespace für das Registrierungscode-Modell
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations; // Für den Datenbankzugriff
+using Microsoft.Extensions.Logging;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class RegisterModel : PageModel
 {
@@ -13,14 +16,14 @@ public class RegisterModel : PageModel
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserStore<IdentityUser> _userStore;
     private readonly ILogger<RegisterModel> _logger;
-    private readonly ApplicationDbContext _context; // Datenbankzugriff
+    private readonly ApplicationDbContext _context;
 
     public RegisterModel(
         UserManager<IdentityUser> userManager,
         IUserStore<IdentityUser> userStore,
         SignInManager<IdentityUser> signInManager,
         ILogger<RegisterModel> logger,
-        ApplicationDbContext context) // Konstruktor mit DbContext
+        ApplicationDbContext context)
     {
         _userManager = userManager;
         _userStore = userStore;
@@ -33,8 +36,6 @@ public class RegisterModel : PageModel
     public InputModel Input { get; set; }
 
     public string ReturnUrl { get; set; }
-
-    public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
     public class InputModel
     {
@@ -61,7 +62,6 @@ public class RegisterModel : PageModel
     public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
         if (!ModelState.IsValid)
         {
@@ -82,13 +82,20 @@ public class RegisterModel : PageModel
         }
 
         var user = CreateUser();
-
         await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
         var result = await _userManager.CreateAsync(user, Input.Password);
 
         if (result.Succeeded)
         {
             _logger.LogInformation("User created a new account with password.");
+
+            // **Den ersten Benutzer automatisch zum Admin machen**
+            var userCount = await _userManager.Users.CountAsync();
+            if (userCount == 1) // Falls es der erste registrierte Benutzer ist
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+                _logger.LogInformation("Erster Benutzer wurde zum Admin gemacht.");
+            }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             return LocalRedirect(returnUrl);
