@@ -1,0 +1,28 @@
+﻿@model Feedback_Application.Areas.Identity.Pages.Account.Manage.IndexModel
+
+<div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="adminModalLabel">Eintrag bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="EntityId" id="EntityId" />
+                    <input type="hidden" asp-for="EntityType" id="EntityType" />
+
+                    <label for="EntityName">Name:</label>
+                    <input type="text" asp-for="EntityName" class="form-control" id="EntityName" required />
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                        <button type="submit" class="btn btn-primary" asp-page-handler="EditEntity">Speichern</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
