@@ -11,15 +11,15 @@ var connectionString = builder.Configuration.GetConnectionString("FeedbackDb");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Identity-Registrierung mit DefaultIdentity
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+// Identity mit Rollenunterstützung registrieren
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.User.RequireUniqueEmail = false;
 })
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders(); // Token für Passwort-Reset etc.
 
-// Razor Pages hinzufügen
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -30,6 +30,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+// Rollen beim Start der App sicherstellen (erst nach app.Build())
+await app.Services.EnsureRolesCreatedAsync();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
