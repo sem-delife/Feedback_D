@@ -20,6 +20,15 @@ function setGeneratedCode(elementId) {
     }
 }
 
+function redirectToPage() {
+    let code = document.getElementById("codeInput").value.trim();
+    if (code) {
+        window.location.href = `/FeedbackPages/FirstFeedbackPages?Code=${encodeURIComponent(code)}`;
+    }
+    return false;
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     setGeneratedCode('generatedCode');
     const steps = document.querySelectorAll('.modal-step'); // Alle Schritte

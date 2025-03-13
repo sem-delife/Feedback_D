@@ -1,33 +1,56 @@
 using Feedback_Application.Pages.Models;
-using Feedback_Application;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using Feedback_Application.Areas.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Feedback_Application;
 
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
 
-    // Konstruktor, um den DbContext zu injizieren
     public IndexModel(ApplicationDbContext context)
     {
         _context = context;
     }
+
     [BindProperty]
     public int UserID { get; set; }
 
     [BindProperty]
     public int SelectedClass { get; set; }
+
     [BindProperty]
     public int SelectedYear { get; set; }
+
     [BindProperty]
     public int SchoolYear { get; set; }
+
     [BindProperty]
     public int Abteilung { get; set; }
+
     [BindProperty]
     public int Fach { get; set; }
+
     [BindProperty]
     public string Code { get; set; }
+
+    // Liste für das Dropdown-Menü
+    public List<SelectListItem> KlassenListe { get; set; }
+
+    // Lädt die verfügbaren Klassen beim Seitenaufruf
+    public void OnGet()
+    {
+        KlassenListe = _context.Klassen
+            .Select(k => new SelectListItem
+            {
+                Value = k.KlassenID.ToString(),
+                Text = k.KlassenName
+            })
+            .ToList();
+    }
 
     // Diese Methode wird beim Absenden des Formulars aufgerufen
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
