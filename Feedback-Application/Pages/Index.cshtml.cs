@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,26 +13,30 @@ public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
 
-    // Konstruktor, um den DbContext zu injizieren
     public IndexModel(ApplicationDbContext context)
     {
         _context = context;
     }
 
     [BindProperty]
-    public int UserID { get; set; }
+    public string UserID { get; set; }
 
-    [BindProperty]
+    [BindProperty, Required(ErrorMessage = "Bitte eine Klasse auswählen.")]
     public int SelectedClass { get; set; }
-    [BindProperty]
+
+    [BindProperty, Required(ErrorMessage = "Bitte eine Jahrgangsstufe auswählen.")]
     public int SelectedYear { get; set; }
-    [BindProperty]
+
+    [BindProperty, Required(ErrorMessage = "Bitte ein Schuljahr auswählen.")]
     public int SchoolYear { get; set; }
-    [BindProperty]
+
+    [BindProperty, Required(ErrorMessage = "Bitte eine Abteilung auswählen.")]
     public int Abteilung { get; set; }
-    [BindProperty]
+
+    [BindProperty, Required(ErrorMessage = "Bitte ein Fach auswählen.")]
     public int Fach { get; set; }
-    [BindProperty]
+
+    [BindProperty, Required(ErrorMessage = "Bitte einen Code generieren.")]
     public string Code { get; set; }
 
     public List<SelectListItem> KlassenList { get; set; }
@@ -40,6 +45,12 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+        if (user != null)
+        {
+            UserID = user.Id; // Falls User existiert, ID setzen
+        }
+
         KlassenList = await _context.Klassen
             .Select(k => new SelectListItem { Value = k.KlassenID.ToString(), Text = k.KlassenName })
             .ToListAsync();
@@ -57,10 +68,23 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
     {
+        if (!ModelState.IsValid)
+        {
+            return Page(); // Falls Fehler auftreten, Modal bleibt offen
+        }
+
         try
         {
+            // Die richtige FeedbackID aus der DB holen
+            var feedbackbogen = await _context.Feedbackbogen.FirstOrDefaultAsync();
+            if (feedbackbogen == null)
+            {
+                return BadRequest("Kein Feedbackbogen gefunden.");
+            }
+
             var erstellt = new Erstellung
             {
+                FeedbackID = feedbackbogen.BogenID, // **Fix: Richtige FeedbackID setzen**
                 UserID = UserID,
                 KlassenID = SelectedClass,
                 Jahrgang = SelectedYear,
@@ -73,7 +97,6 @@ public class IndexModel : PageModel
             _context.Erstellung.Add(erstellt);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine("Feedback erfolgreich in DB gespeichert.");
             return RedirectToPage("/Index");
         }
         catch (Exception ex)

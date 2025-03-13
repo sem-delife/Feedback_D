@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
             </div>
             <div class="modal-body">
-                <form method="post">
+                <form method="post" asp-page-handler="AddEntity">
                     @Html.AntiForgeryToken()
 
                     <input type="hidden" asp-for="EntityId" id="EntityId" />
@@ -19,10 +19,37 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                        <button type="submit" class="btn btn-primary" asp-page-handler="EditEntity">Speichern</button>
+                        <button type="submit" class="btn btn-primary"
+                                id="modalSaveButton">
+                            Speichern
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function setEntityTypeAndShowModal(entityType) {
+            document.getElementById("EntityType").value = entityType;
+            document.getElementById("EntityName").value = "";
+            document.getElementById("EntityId").value = 0;
+            document.getElementById("modalSaveButton").setAttribute("formaction", "?handler=AddEntity");
+
+            var modal = new bootstrap.Modal(document.getElementById("adminModal"));
+            modal.show();
+        }
+
+        function setEditEntity(id, name, type) {
+            document.getElementById("EntityId").value = id;
+            document.getElementById("EntityName").value = name;
+            document.getElementById("EntityType").value = type;
+            document.getElementById("modalSaveButton").setAttribute("formaction", "?handler=EditEntity");
+
+            var modal = new bootstrap.Modal(document.getElementById("adminModal"));
+            modal.show();
+        }
+    </script>
+}
