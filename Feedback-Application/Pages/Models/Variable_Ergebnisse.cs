@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Feedback_Application.Pages.Models
 {
@@ -12,7 +12,7 @@ namespace Feedback_Application.Pages.Models
         public int FragenID { get; set; } // Fremdschlüssel für ExtraFeedback
 
         [ForeignKey("Erstellung")]
-        public int FeedbackID { get; set; } // Fremdschlüssel für Feedback (Erstellung)
+        public int ErstellungsID { get; set; } // Fremdschlüssel für die Erstellung des Feedbackbogens
 
         public string AntwortUser { get; set; } // Die Antwort des Benutzers
     }

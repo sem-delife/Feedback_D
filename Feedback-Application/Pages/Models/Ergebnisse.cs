@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Feedback_Application.Pages.Models
 {
@@ -19,5 +19,8 @@ namespace Feedback_Application.Pages.Models
 
         [ForeignKey("VariableErgebnisse")]
         public int? VarErgebnisID { get; set; } // Fremdschlüssel für VariableErgebnisse (optional)
+
+        [ForeignKey("Erstellung")]
+        public int ErstellungsID { get; set; } // NEU: ID der spezifischen Feedback-Erstellung
     }
 }

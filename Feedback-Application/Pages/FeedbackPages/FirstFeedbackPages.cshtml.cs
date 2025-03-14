@@ -92,7 +92,9 @@ namespace Feedback_Application.Pages
             }
 
             int feedbackID = erstellung.FeedbackID;
+            int erstellungsID = erstellung.ErstellungsID; // ErstellungsID holen
 
+            // Radio-Button-Bewertungen sammeln
             var ausgewählteBewertungen = Request.Form.Keys
                 .Where(k => k.StartsWith("bewertung_"))
                 .Select(k => new
@@ -107,11 +109,13 @@ namespace Feedback_Application.Pages
                 _context.Ergebnisse.Add(new Ergebnisse
                 {
                     FeedbackID = feedbackID,
+                    ErstellungsID = erstellungsID, // ErstellungsID setzen
                     AussageID = bewertung.AussageID,
                     BewertungsID = bewertung.BewertungsID
                 });
             }
 
+            // Freitextantworten speichern
             var extraFeedbackAntworten = Request.Form.Keys
                 .Where(k => k.StartsWith("extra_feedback_"))
                 .Select(k => new
@@ -128,6 +132,7 @@ namespace Feedback_Application.Pages
                     _context.Variable_Ergebnisse.Add(new Variable_Ergebnisse
                     {
                         FragenID = extra.FrageID,
+                        ErstellungsID = erstellungsID, // ErstellungsID setzen
                         AntwortUser = extra.Antwort
                     });
                 }
@@ -135,7 +140,6 @@ namespace Feedback_Application.Pages
 
             await _context.SaveChangesAsync();
             return RedirectToPage("/FeedbackPages/FeedbackSuccess");
-
         }
     }
 }
