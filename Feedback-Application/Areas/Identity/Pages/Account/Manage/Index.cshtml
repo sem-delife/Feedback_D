@@ -1,30 +1,88 @@
 ﻿@page
-@model IndexModel
+@model Feedback_Application.Areas.Identity.Pages.Account.Manage.IndexModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "Profil";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <div class="row">
     <div class="col-md-6">
         <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
+            <div class="form-group">
                 <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" disabled />
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
         </form>
+    </div>
+
+    <div class="col-md-6">
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="bi bi-tools fs-4 me-2"></i>
+                    <span>Admin-Einstellungen</span>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="SaveTeacherCode">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="TeacherCode" class="form-label">
+                                <i class="bi bi-key"></i> Lehrer-Registrierungscode
+                            </label>
+                            <input asp-for="TeacherCode" class="form-control" />
+                            <span asp-validation-for="TeacherCode" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-save"></i> Speichern
+                        </button>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+                    {
+                        <div class="alert alert-success mt-3">@Model.StatusMessage</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Tabellen für Klassen, Fächer und Abteilungen -->
+            @foreach (var table in Model.DataTables)
+            {
+                <partial name="_AdminDataTable" model="table" />
+            }
+
+            <!-- Modal für das Hinzufügen/Bearbeiten -->
+            <partial name="_AdminModal" model="Model" />
+        }
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function setEntityTypeAndShowModal(entityType) {
+            document.getElementById("EntityType").value = entityType;
+            document.getElementById("EntityName").value = "";
+            document.getElementById("EntityId").value = 0;
+            var modal = new bootstrap.Modal(document.getElementById("adminModal"));
+            modal.show();
+        }
+
+        function setEditEntity(id, name, type) {
+            document.getElementById("EntityId").value = id;
+            document.getElementById("EntityName").value = name;
+            document.getElementById("EntityType").value = type;
+            var modal = new bootstrap.Modal(document.getElementById("adminModal"));
+            modal.show();
+        }
+    </script>
 }

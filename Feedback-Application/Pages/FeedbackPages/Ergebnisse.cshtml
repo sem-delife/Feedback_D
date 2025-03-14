@@ -1,29 +1,68 @@
 ﻿@page
 @model Feedback_Application.Pages.FeedbackPages.ErgebnisseModel
 @{
-    ViewData["Title"] = "Result Page";
+    ViewData["Title"] = "Ergebnisse";
 }
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selection Side</title>
-    <link rel="stylesheet" href="~/css/Ergebnisse.css" />
-</head>
-<body>
-    <div class="container-Results">
-        <table class="survey-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titel</th>
-                    <th>Erstellt</th>
-                </tr>
-            </thead>
-            <tbody>
-            @* Hier müssen dann alle "Umfragen" selected werden und per for schleife eingefügt werden  *@
-            </tbody>
-        </table>
+
+<link rel="stylesheet" href="~/css/Ergebnisse.css" />
+
+<div class="feedback-container">
+    <h2>Feedback-Ergebnisse</h2>
+
+    <div class="accordion" id="feedbackAccordion">
+        @if (Model.FeedbackErgebnisse.Any())
+        {
+            @foreach (var feedback in Model.FeedbackErgebnisse.OrderByDescending(f => f.Erstellungsdatum))
+            {
+                var feedbackId = $"feedback-{feedback.ErstellungsID}";
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-@feedbackId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse-@feedbackId" aria-expanded="false" aria-controls="collapse-@feedbackId">
+                            @feedback.FeedbackTitel (Erstellt am: @feedback.Erstellungsdatum.ToShortDateString())
+                        </button>
+                    </h2>
+                    <div id="collapse-@feedbackId" class="accordion-collapse collapse" aria-labelledby="heading-@feedbackId"
+                         data-bs-parent="#feedbackAccordion">
+                        <div class="accordion-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Aussage</th>
+                                        <th colspan="4">Antworten</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (feedback.Ergebnisse.Any())
+                                    {
+                                        @foreach (var ergebnis in feedback.Ergebnisse)
+                                        {
+                                            <tr>
+                                                <td>@ergebnis.Aussage</td>
+                                                @foreach (var antwort in ergebnis.Antwortverteilung)
+                                                {
+                                                    <td>@antwort.Key: @antwort.Value</td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="5" class="text-center">Keine Antworten für diesen Feedbackbogen vorhanden.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Es sind noch keine Feedback-Ergebnisse vorhanden.</p>
+        }
     </div>
-</body>
-</html>
+</div>

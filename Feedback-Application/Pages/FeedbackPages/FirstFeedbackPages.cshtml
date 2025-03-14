@@ -1,0 +1,76 @@
+﻿@page
+@model Feedback_Application.Pages.FeedbackReportModel
+@{
+    ViewData["Title"] = "Feedbackbogen";
+}
+
+<link rel="stylesheet" href="/css/feedback_styles.css">
+
+<div class="feedback-container">
+    <h3>Unterrichtsbeurteilung durch Schülerinnen und Schüler</h3>
+
+    <form method="post">
+        <input type="hidden" asp-for="Code" />
+
+        @if (Model.Oberthemen != null && Model.Oberthemen.Any())
+        {
+            @foreach (var thema in Model.Oberthemen)
+            {
+                <div class="theme-box">
+                    <h3>@thema.Thema</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Aussage</th>
+                                    @foreach (var bewertung in Model.Bewertungen.DistinctBy(b => b.BewertungsChar))
+                                    {
+                                        <th>@bewertung.BewertungsChar</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var aussage in Model.Aussagen.Where(a => a.ThemaID == thema.ThemaID))
+                                {
+                                    <tr>
+                                        <td>@aussage.Aussage</td>
+                                        @foreach (var bewertung in Model.Bewertungen.DistinctBy(b => b.BewertungsChar))
+                                        {
+                                            <td class="checkbox-container">
+                                                <input type="radio" name="bewertung_@aussage.AussageID"
+                                                       value="@bewertung.BewertungsID" required />
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.ExtraFeedbacks.Any())
+            {
+                <div class="theme-box">
+                    <h3>Zusätzliches Feedback</h3>
+                    <ul>
+                        @foreach (var extra in Model.ExtraFeedbacks)
+                        {
+                            <li>
+                                <label>@extra.Frage</label>
+                                <textarea name="extra_feedback_@extra.FragenID"></textarea>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <!-- Absenden-Button -->
+            <button type="submit" class="btn btn-primary">Absenden</button>
+        }
+        else
+        {
+            <p>Kein Feedbackbogen gefunden.</p>
+        }
+    </form>
+</div>

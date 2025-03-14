@@ -7,7 +7,6 @@
 <head>
     <link rel="stylesheet" href="~/css/Homepage.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>src ="js/main.js"</script>
 </head>
 
 <div>
@@ -47,58 +46,61 @@
     }
 </div>
 <form method="post" asp-page-handler="SubmitFeedback">
-    <!-- Diese Felder müssen als 'hidden' gesendet werden -->
-    <input type="hidden" name="UserID" id="UserID" />
-    <input type="hidden" name="SelectedClass" id="selectedClass" />
-    <input type="hidden" name="SelectedYear" id="selectedYear" />
-    <input type="hidden" name="SchoolYear" id="schoolYearInput" />
-    <input type="hidden" name="Abteilung" id="AbteilungInput" />
-    <input type="hidden" name="Fach" id="FachInput" />
-    <input type="hidden" name="Code" id="generatedCodeInput" />
+    @Html.AntiForgeryToken()
 
-    <button hidden type="submit" class="btn btn-primary">Absenden</button>
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <input type="hidden" asp-for="UserID" id="UserID" />
+    <input type="hidden" asp-for="SelectedClass" id="selectedClass" />
+    <input type="hidden" asp-for="SelectedYear" id="selectedYear" />
+    <input type="hidden" asp-for="SchoolYear" id="schoolYearInput" />
+    <input type="hidden" asp-for="Abteilung" id="AbteilungInput" />
+    <input type="hidden" asp-for="Fach" id="FachInput" />
+    <input type="hidden" asp-for="Code" id="generatedCodeInput" />
+
+    <button type="submit" class="btn btn-primary d-none" id="formSubmitButton">Absenden</button>
 </form>
 
 
 
+
 <!-- Multi-Step Modal -->
-<div class="modal fade" id="multiStepModal" tabindex="-1" aria-labelledby="multiStepModalLabel" aria-hidden="true">
+<div class="modal fade" id="multiStepModal" tabindex="-1" aria-labelledby="Feedback-Bogen erstellen" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="multiStepModalLabel">Multi-Step Modal</h5>
+                <h5 class="modal-title" id="multiStepModalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="step1" class="modal-step">
-                    <h4>Choose a Form</h4>
+                    <h4>Wählen sie ihr Formular</h4>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="formSelection" id="form1" value="Form 1">
-                        <label class="form-check-label" for="form1">Form 1</label>
+                        <label class="form-check-label" for="form1">Klassisch</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="formSelection" id="form2" value="Form 2">
-                        <label class="form-check-label" for="form2">Form 2</label>
+                        <label class="form-check-label" for="form2">Zielscheibe</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="formSelection" id="form3" value="Form 3">
-                        <label class="form-check-label" for="form3">Form 3</label>
+                        <label class="form-check-label" for="form3">Smiley-Tabelle</label>
                     </div>
                 </div>
 
                 <div id="step2" class="modal-step d-none">
-                    <h4>Settings</h4>
+                    <h4>Einstellungen</h4>
                     <div class="form-check">
                         @* <input class="form-check-input" type="checkbox" id="setting1"> *@
                         @* <label class="form-check-label" for="setting1">Enable Option 1</label> *@
                         <label for="classDropdown">Wählen Sie eine Klasse:</label>
-                        <select id="classDropdown" name="selectedClass" class="form-control">
+                        <select id="classDropdown" name="SelectedClass" class="form-control">
                             <option value="">Bitte wählen...</option>
-                            <option value="IFA12A">IFA12A</option>
-                            <option value="IFA12B">IFA12B</option>
-                            <option value="IFA12C">IFA12C</option>
-                            <option value="IFS12A">IFS12A</option>
-                            <option value="IFS12B">IFS12B</option>
+                            @foreach (var item in Model.KlassenList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
                         </select>
                     </div>
                     <div class="form-check">
@@ -107,6 +109,15 @@
                         <label for="yearDropdown">Wählen Sie eine Jahrgangsstufe:</label>
                         <select id="yearDropdown" name="selectedYear" class="form-control">
                             <option value="">Bitte wählen...</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="form-check">
+                        <label for="schoolYear">Wählen Sie ein Schuljahr:</label>
+                        <select id="schoolYear" name="SelectedSchoolYear" class="form-control">
+                            <option value="">Bitte wählen...</option>
                             @for (int year = DateTime.Now.Year - 4; year <= DateTime.Now.Year; year++)
                             {
                                 <option value="@year">@year</option>
@@ -114,92 +125,41 @@
                         </select>
                     </div>
                     <div class="form-check">
-                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
-                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
-                        <label for="schoolYear">Geben Sie das Schuljahr ein:</label>
-                        <input type="number" id="schoolYear" name="schoolYear" class="form-control" placeholder="z.B. 2025" required />
+                        <label for="Abteilung">Wählen Sie eine Abteilung:</label>
+                        <select id="Abteilung" name="Abteilung" class="form-control">
+                            <option value="">Bitte wählen...</option>
+                            @foreach (var item in Model.AbteilungList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
                     </div>
                     <div class="form-check">
-                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
-                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
-                        <label for="Abteilung">Geben Sie die Abteilung ein:</label>
-                        <input type="text" id="Abteilung" name="Abteilung" class="form-control" placeholder="z.B. IT" required />
-                    </div>
-                    <div class="form-check">
-                        @* <input class="form-check-input" type="checkbox" id="setting3"> *@
-                        @* <label class="form-check-label" for="setting3">Enable Option 3</label> *@
-                        <label for="Fach">Geben Sie die Abteilung ein:</label>
-                        <label for="Fach">Geben Sie das Fach ein:</label>
-                        <input type="text" id="Fach" name="Fach" class="form-control" placeholder="z.B. AWP" required />
+                        <label for="Fach">Wählen Sie ein Fach:</label>
+                        <select id="Fach" name="Fach" class="form-control">
+                            <option value="">Bitte wählen...</option>
+                            @foreach (var item in Model.FachList)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
                     </div>
                 </div>
 
                 <div id="step3" class="modal-step d-none">
-                    <h4>Your Generated Code</h4>
+                    <h4>Geben sie diesen Code an ihre Klasse weiter</h4>
                     <p id="generatedCode" class="fs-4 fw-bold text-center"></p>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="prevBtn" class="btn btn-secondary d-none">Back</button>
                 <button type="button" id="nextBtn" class="btn btn-primary">Next</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const steps = document.querySelectorAll('.modal-step'); // Alle Schritte
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        let currentStep = 0; // Start bei Schritt 0
-
-        // Funktion zum Aktualisieren der Sichtbarkeit der Schritte
-        function updateStep() {
-            steps.forEach((step, index) => {
-                step.classList.toggle('d-none', index !== currentStep);
-            });
-
-            // Back-Button nur sichtbar machen, wenn nicht am ersten Schritt
-            prevBtn.classList.toggle('d-none', currentStep === 0);
-            // Next-Button-Text ändern, wenn am letzten Schritt
-            nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
-        }
-
-        // Weiter-Button
-        nextBtn.addEventListener('click', () => {
-            if (currentStep < steps.length - 1) {
-                currentStep++;
-                updateStep();
-            } else {
-                 // Die Formularfelder aus dem Modal auslesen und in die versteckten Felder setzen
-                document.getElementById('UserID').value = 1;
-                document.getElementById('selectedClass').value = 0;//document.getElementById('classDropdown').value
-                document.getElementById('selectedYear').value = document.getElementById('yearDropdown').value;
-                document.getElementById('schoolYearInput').value = document.getElementById('schoolYear').value;
-                document.getElementById('AbteilungInput').value = 0;//document.getElementById('Abteilung').value
-                document.getElementById('FachInput').value = 0;//document.getElementById('Fach').value
-                document.getElementById('generatedCodeInput').value = document.getElementById('generatedCode').innerText;
-
-
-                const modal = document.getElementById('multiStepModal');
-                const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                bootstrapModal.hide();
-                document.querySelector('form').submit();
-            }
-        });
-
-        // Zurück-Button
-        prevBtn.addEventListener('click', () => {
-            if (currentStep > 0) {
-                currentStep--;
-                updateStep();
-            }
-        });
-
-        // Initiale Sichtbarkeit setzen
-        updateStep();
-    });
-</script>
+@section Scripts {
+    <script src="~/js/main.js"></script>
+}

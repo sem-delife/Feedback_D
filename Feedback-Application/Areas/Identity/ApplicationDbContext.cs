@@ -56,7 +56,68 @@ namespace Feedback_Application
                 entity.Property(e => e.ClaimValue).HasColumnType("longtext");
             });
 
-            Console.WriteLine("Kill me pls");
+            // Feedbackbogen
+            modelBuilder.Entity<Feedbackbogen>().HasData(
+                new Feedbackbogen { BogenID = 1, Beschreibung = "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I" }
+            );
+
+            // Oberthemen
+            modelBuilder.Entity<Oberthema>().HasData(
+                new Oberthema { ThemaID = 1, BogenID = 1, Thema = "Verhalten des Lehrers:" },
+                new Oberthema { ThemaID = 2, BogenID = 1, Thema = "Bewerten Sie folgende Aussagen:" },
+                new Oberthema { ThemaID = 3, BogenID = 1, Thema = "Wie ist der Unterricht?" },
+                new Oberthema { ThemaID = 4, BogenID = 1, Thema = "Bewerten Sie folgende Behauptungen:" }
+            );
+
+            // Aussagen
+            modelBuilder.Entity<Aussagen>().HasData(
+                new Aussagen { AussageID = 1, ThemaID = 1, Aussage = "Sie/Er ist ungeduldig" },
+                new Aussagen { AussageID = 2, ThemaID = 1, Aussage = "Sie/Er ist sicher im Auftreten" },
+                new Aussagen { AussageID = 3, ThemaID = 1, Aussage = "Sie/Er ist freundlich" },
+                new Aussagen { AussageID = 4, ThemaID = 1, Aussage = "Sie/Er ist erregbar und aufbrausend" },
+                new Aussagen { AussageID = 5, ThemaID = 1, Aussage = "Sie/Er ist tatkraeftig, aktiv" },
+                new Aussagen { AussageID = 6, ThemaID = 1, Aussage = "Sie/Er ist aufgeschlossen" },
+
+                new Aussagen { AussageID = 7, ThemaID = 2, Aussage = "Die Lehrerin, der Lehrer bevorzugt manche Schuelerinnen oder Schueler." },
+                new Aussagen { AussageID = 8, ThemaID = 2, Aussage = "Die Lehrerin, der Lehrer nimmt die Schuelerinnen und Schueler ernst." },
+                new Aussagen { AussageID = 9, ThemaID = 2, Aussage = "Die Lehrerin, der Lehrer ermutigt und lobt viel." },
+                new Aussagen { AussageID = 10, ThemaID = 2, Aussage = "Die Lehrerin, der Lehrer entscheidet immer allein." },
+                new Aussagen { AussageID = 11, ThemaID = 2, Aussage = "Die Lehrerin, der Lehrer gesteht eigene Fehler ein." },
+
+                new Aussagen { AussageID = 12, ThemaID = 3, Aussage = "Die Ziele des Unterrichts sind klar erkennbar" },
+                new Aussagen { AussageID = 13, ThemaID = 3, Aussage = "Der Lehrer redet zu viel." },
+                new Aussagen { AussageID = 14, ThemaID = 3, Aussage = "Der Lehrer schweift oft vom Thema ab." },
+                new Aussagen { AussageID = 15, ThemaID = 3, Aussage = "Die Fragen und Beiträge der Schuelerinnen und Schueler werden ernst genommen." },
+                new Aussagen { AussageID = 16, ThemaID = 3, Aussage = "Die Sprache des Lehrers ist gut verstaendlich." },
+                new Aussagen { AussageID = 17, ThemaID = 3, Aussage = "Der Lehrer achtet auf Ruhe und Disziplin im Unterricht." },
+                new Aussagen { AussageID = 18, ThemaID = 3, Aussage = "Der Unterricht ist abwechslungsreich." },
+                new Aussagen { AussageID = 19, ThemaID = 3, Aussage = "Unterrichtsmaterialien sind ansprechend und gut verstaendlich gestaltet" },
+                new Aussagen { AussageID = 20, ThemaID = 3, Aussage = "Der Stoff wird ausreichend wiederholt und geuebt." },
+
+                new Aussagen { AussageID = 21, ThemaID = 4, Aussage = "Die Themen der Schulaufgaben werden rechtzeitig vorher bekannt gegeben." },
+                new Aussagen { AussageID = 22, ThemaID = 4, Aussage = "Der Schwierigkeitsgrad der Leistungsnachweise entspricht dem der Unterrichtsinhalte." },
+                new Aussagen { AussageID = 23, ThemaID = 4, Aussage = "Die Bewertungen sind nachvollziehbar und verstaendlich." }
+            );
+
+            // Bewertungen
+            modelBuilder.Entity<Bewertungen>().HasData(
+                new Bewertungen { BewertungsID = 1, BogenID = 1, BewertungsChar = "trifft voellig zu", BewertungsInt = 4 },
+                new Bewertungen { BewertungsID = 2, BogenID = 1, BewertungsChar = "trifft eher zu", BewertungsInt = 3 },
+                new Bewertungen { BewertungsID = 3, BogenID = 1, BewertungsChar = "trifft eher nicht zu", BewertungsInt = 2 },
+                new Bewertungen { BewertungsID = 4, BogenID = 1, BewertungsChar = "trifft ueberhaupt nicht zu", BewertungsInt = 1 }
+            );
+
+            // ExtraFeedback
+            modelBuilder.Entity<ExtraFeedback>().HasData(
+                new ExtraFeedback { FragenID = 1, BogenID = 1, Frage = "Das hat mir besonders gut gefallen:" },
+                new ExtraFeedback { FragenID = 2, BogenID = 1, Frage = "Das hat mir nicht gefallen:" },
+                new ExtraFeedback { FragenID = 3, BogenID = 1, Frage = "Verbesserungsvorschlaege:" }
+            );
+
+            // Seeding für Registrierung (Lehrer-Code)
+            modelBuilder.Entity<Registrierung>().HasData(
+                new Registrierung { RegID = 1, RegPasswort = "ABCDE" }
+            );
         }
 
 

@@ -1,77 +1,35 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using Feedback_Application.Pages.Models;
+using Feedback_Application.Areas.Identity.Pages.Account.Manage.Models;
 
 namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly ApplicationDbContext _context;
 
-        public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+        public IndexModel(UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
+        [TempData] public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [TempData]
-        public string StatusMessage { get; set; }
+        [BindProperty(SupportsGet = true)] public string? TeacherCode { get; set; }
+        [BindProperty] public string? EntityType { get; set; }
+        [BindProperty] public string? EntityName { get; set; }
+        [BindProperty] public int? EntityId { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [BindProperty]
-        public InputModel Input { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public class InputModel
-        {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
-
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
+        public List<AdminDataTableViewModel> DataTables { get; set; } = new();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -81,37 +39,177 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await LoadAsync(user);
+            Username = user.UserName;
+
+            // Lehrer-Code aus der Datenbank laden
+            var registrationEntry = await _context.Registrierung.FindAsync(1);
+            TeacherCode = registrationEntry?.RegPasswort ?? "";
+
+            DataTables = new List<AdminDataTableViewModel>
+            {
+                new AdminDataTableViewModel
+                {
+                    Title = "Klassen",
+                    Items = await _context.Klassen.Cast<object>().ToListAsync(),
+                    NameField = "KlassenName",
+                    IdField = "KlassenID"
+                },
+                new AdminDataTableViewModel
+                {
+                    Title = "Fächer",
+                    Items = await _context.Fach.Cast<object>().ToListAsync(),
+                    NameField = "FachName",
+                    IdField = "FachID"
+                },
+                new AdminDataTableViewModel
+                {
+                    Title = "Abteilungen",
+                    Items = await _context.Abteilung.Cast<object>().ToListAsync(),
+                    NameField = "AbteilungName",
+                    IdField = "AbteilungsID"
+                }
+            };
+
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostSaveTeacherCodeAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            // Nur TeacherCode validieren
+            ModelState.Clear();
+            if (string.IsNullOrWhiteSpace(TeacherCode))
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
+                ModelState.AddModelError(nameof(TeacherCode), "Der Lehrer-Code darf nicht leer sein.");
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            var registrationEntry = await _context.Registrierung.FindAsync(1);
+            if (registrationEntry != null)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
+                registrationEntry.RegPasswort = TeacherCode;
+                _context.Registrierung.Update(registrationEntry);
+            }
+            else
+            {
+                registrationEntry = new Registrierung { RegID = 1, RegPasswort = TeacherCode };
+                await _context.Registrierung.AddAsync(registrationEntry);
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            await _context.SaveChangesAsync();
+            StatusMessage = "Lehrer-Code wurde erfolgreich aktualisiert!";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostAddEntityAsync()
+        {
+            // Nur die Felder für Entitäten validieren
+            ModelState.Clear();
+            if (string.IsNullOrWhiteSpace(EntityName))
+            {
+                ModelState.AddModelError("", "Der Name darf nicht leer sein.");
+                return Page();
+            }
+
+            if (EntityType == "Klassen")
+            {
+                _context.Klassen.Add(new Klassen { KlassenName = EntityName });
+            }
+            else if (EntityType == "Fächer")
+            {
+                _context.Fach.Add(new Fach { FachName = EntityName });
+            }
+            else if (EntityType == "Abteilungen")
+            {
+                _context.Abteilung.Add(new Abteilung { AbteilungName = EntityName });
+            }
+            else
+            {
+                ModelState.AddModelError("", "Ungültiger Typ.");
+                return Page();
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostEditEntityAsync()
+        {
+            // Nur die Felder für Bearbeiten validieren
+            ModelState.Clear();
+            if (EntityId == null || EntityId <= 0 || string.IsNullOrWhiteSpace(EntityName))
+            {
+                ModelState.AddModelError("", "Ungültige Eingabe.");
+                return Page();
+            }
+
+            if (EntityType == "Klassen")
+            {
+                var entity = await _context.Klassen.FindAsync(EntityId);
+                if (entity != null)
+                {
+                    entity.KlassenName = EntityName;
+                    _context.Klassen.Update(entity);
+                }
+            }
+            else if (EntityType == "Fächer")
+            {
+                var entity = await _context.Fach.FindAsync(EntityId);
+                if (entity != null)
+                {
+                    entity.FachName = EntityName;
+                    _context.Fach.Update(entity);
+                }
+            }
+            else if (EntityType == "Abteilungen")
+            {
+                var entity = await _context.Abteilung.FindAsync(EntityId);
+                if (entity != null)
+                {
+                    entity.AbteilungName = EntityName;
+                    _context.Abteilung.Update(entity);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Ungültiger Typ.");
+                return Page();
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteEntityAsync(int entityId, string entityType)
+        {
+            // Keine Validierung auf ModelState, nur Basisprüfung
+            if (entityId <= 0 || string.IsNullOrWhiteSpace(entityType))
+            {
+                return BadRequest("Ungültige Anfrage.");
+            }
+
+            object entity = null;
+
+            if (entityType == "Klassen")
+            {
+                entity = await _context.Klassen.FindAsync(entityId);
+                if (entity != null) _context.Klassen.Remove((Klassen)entity);
+            }
+            else if (entityType == "Fächer")
+            {
+                entity = await _context.Fach.FindAsync(entityId);
+                if (entity != null) _context.Fach.Remove((Fach)entity);
+            }
+            else if (entityType == "Abteilungen")
+            {
+                entity = await _context.Abteilung.FindAsync(entityId);
+                if (entity != null) _context.Abteilung.Remove((Abteilung)entity);
+            }
+
+            if (entity != null)
+            {
+                await _context.SaveChangesAsync();
+            }
+
             return RedirectToPage();
         }
     }
