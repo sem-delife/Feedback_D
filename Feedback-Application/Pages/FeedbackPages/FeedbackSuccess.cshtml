@@ -1,0 +1,28 @@
+﻿@page
+@model FeedbackSuccessModel
+@{
+    ViewData["Title"] = "Feedback erfolgreich gesendet";
+}
+
+<div class="feedback-success-container">
+    <h1>Danke schön fürs Teilnehmen!</h1>
+</div>
+
+<a href="/" class="btn btn-primary mt-4">Zurück zur Startseite</a>
+
+<style>
+    .feedback-success-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        text-align: center;
+    }
+
+    .feedback-success-container h1 {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+</style>

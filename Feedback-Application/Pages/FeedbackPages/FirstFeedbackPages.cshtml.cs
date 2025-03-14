@@ -36,7 +36,7 @@ namespace Feedback_Application.Pages
             }
 
             var erstellung = await _context.Erstellung
-                .FirstOrDefaultAsync(e => e.Code == Code);
+                .FirstOrDefaultAsync(e => e.Code.Trim().ToLower() == Code.Trim().ToLower());
 
             if (erstellung == null)
             {
@@ -72,6 +72,70 @@ namespace Feedback_Application.Pages
                 .ToListAsync();
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (string.IsNullOrEmpty(Code))
+            {
+                ModelState.AddModelError("", "Kein Code angegeben.");
+                return Page();
+            }
+
+            var erstellung = await _context.Erstellung
+                .FirstOrDefaultAsync(e => e.Code.Trim().ToLower() == Code.Trim().ToLower());
+
+            if (erstellung == null)
+            {
+                ModelState.AddModelError("", "Kein Feedbackbogen mit diesem Code gefunden.");
+                return Page();
+            }
+
+            int feedbackID = erstellung.FeedbackID;
+
+            var ausgewählteBewertungen = Request.Form.Keys
+                .Where(k => k.StartsWith("bewertung_"))
+                .Select(k => new
+                {
+                    AussageID = int.Parse(k.Split('_')[1]),
+                    BewertungsID = int.Parse(Request.Form[k])
+                })
+                .ToList();
+
+            foreach (var bewertung in ausgewählteBewertungen)
+            {
+                _context.Ergebnisse.Add(new Ergebnisse
+                {
+                    FeedbackID = feedbackID,
+                    AussageID = bewertung.AussageID,
+                    BewertungsID = bewertung.BewertungsID
+                });
+            }
+
+            var extraFeedbackAntworten = Request.Form.Keys
+                .Where(k => k.StartsWith("extra_feedback_"))
+                .Select(k => new
+                {
+                    FrageID = int.Parse(k.Split('_')[2]),
+                    Antwort = Request.Form[k]
+                })
+                .ToList();
+
+            foreach (var extra in extraFeedbackAntworten)
+            {
+                if (!string.IsNullOrWhiteSpace(extra.Antwort))
+                {
+                    _context.Variable_Ergebnisse.Add(new Variable_Ergebnisse
+                    {
+                        FragenID = extra.FrageID,
+                        AntwortUser = extra.Antwort
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToPage("/FeedbackPages/FeedbackSuccess");
+
         }
     }
 }

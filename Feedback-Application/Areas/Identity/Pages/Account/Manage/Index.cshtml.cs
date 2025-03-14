@@ -24,11 +24,10 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
         public string Username { get; set; }
         [TempData] public string StatusMessage { get; set; }
 
-        [BindProperty] public string TeacherCode { get; set; }
-
-        [BindProperty] public string EntityType { get; set; }
-        [BindProperty] public string EntityName { get; set; }
-        [BindProperty] public int EntityId { get; set; }
+        [BindProperty(SupportsGet = true)] public string? TeacherCode { get; set; }
+        [BindProperty] public string? EntityType { get; set; }
+        [BindProperty] public string? EntityName { get; set; }
+        [BindProperty] public int? EntityId { get; set; }
 
         public List<AdminDataTableViewModel> DataTables { get; set; } = new();
 
@@ -41,6 +40,8 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             }
 
             Username = user.UserName;
+
+            // Lehrer-Code aus der Datenbank laden
             var registrationEntry = await _context.Registrierung.FindAsync(1);
             TeacherCode = registrationEntry?.RegPasswort ?? "";
 
@@ -65,15 +66,44 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
                     Title = "Abteilungen",
                     Items = await _context.Abteilung.Cast<object>().ToListAsync(),
                     NameField = "AbteilungName",
-                    IdField = "AbteilungID"
+                    IdField = "AbteilungsID"
                 }
             };
 
             return Page();
         }
 
+        public async Task<IActionResult> OnPostSaveTeacherCodeAsync()
+        {
+            // Nur TeacherCode validieren
+            ModelState.Clear();
+            if (string.IsNullOrWhiteSpace(TeacherCode))
+            {
+                ModelState.AddModelError(nameof(TeacherCode), "Der Lehrer-Code darf nicht leer sein.");
+                return Page();
+            }
+
+            var registrationEntry = await _context.Registrierung.FindAsync(1);
+            if (registrationEntry != null)
+            {
+                registrationEntry.RegPasswort = TeacherCode;
+                _context.Registrierung.Update(registrationEntry);
+            }
+            else
+            {
+                registrationEntry = new Registrierung { RegID = 1, RegPasswort = TeacherCode };
+                await _context.Registrierung.AddAsync(registrationEntry);
+            }
+
+            await _context.SaveChangesAsync();
+            StatusMessage = "Lehrer-Code wurde erfolgreich aktualisiert!";
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostAddEntityAsync()
         {
+            // Nur die Felder für Entitäten validieren
+            ModelState.Clear();
             if (string.IsNullOrWhiteSpace(EntityName))
             {
                 ModelState.AddModelError("", "Der Name darf nicht leer sein.");
@@ -104,60 +134,54 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostEditEntityAsync()
         {
-            if (EntityId <= 0 || string.IsNullOrWhiteSpace(EntityName))
+            // Nur die Felder für Bearbeiten validieren
+            ModelState.Clear();
+            if (EntityId == null || EntityId <= 0 || string.IsNullOrWhiteSpace(EntityName))
             {
                 ModelState.AddModelError("", "Ungültige Eingabe.");
                 return Page();
             }
 
-            try
+            if (EntityType == "Klassen")
             {
-                if (EntityType == "Klassen")
+                var entity = await _context.Klassen.FindAsync(EntityId);
+                if (entity != null)
                 {
-                    var entity = await _context.Klassen.FindAsync(EntityId);
-                    if (entity != null)
-                    {
-                        entity.KlassenName = EntityName;
-                        _context.Klassen.Update(entity);
-                    }
+                    entity.KlassenName = EntityName;
+                    _context.Klassen.Update(entity);
                 }
-                else if (EntityType == "Fächer")
-                {
-                    var entity = await _context.Fach.FindAsync(EntityId);
-                    if (entity != null)
-                    {
-                        entity.FachName = EntityName;
-                        _context.Fach.Update(entity);
-                    }
-                }
-                else if (EntityType == "Abteilungen")
-                {
-                    var entity = await _context.Abteilung.FindAsync(EntityId);
-                    if (entity != null)
-                    {
-                        entity.AbteilungName = EntityName;
-                        _context.Abteilung.Update(entity);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Ungültiger Typ.");
-                    return Page();
-                }
-
-                await _context.SaveChangesAsync();
-                return RedirectToPage();
             }
-            catch (Exception ex)
+            else if (EntityType == "Fächer")
             {
-                ModelState.AddModelError("", "Fehler beim Bearbeiten: " + ex.Message);
+                var entity = await _context.Fach.FindAsync(EntityId);
+                if (entity != null)
+                {
+                    entity.FachName = EntityName;
+                    _context.Fach.Update(entity);
+                }
+            }
+            else if (EntityType == "Abteilungen")
+            {
+                var entity = await _context.Abteilung.FindAsync(EntityId);
+                if (entity != null)
+                {
+                    entity.AbteilungName = EntityName;
+                    _context.Abteilung.Update(entity);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Ungültiger Typ.");
                 return Page();
             }
-        }
 
+            await _context.SaveChangesAsync();
+            return RedirectToPage();
+        }
 
         public async Task<IActionResult> OnPostDeleteEntityAsync(int entityId, string entityType)
         {
+            // Keine Validierung auf ModelState, nur Basisprüfung
             if (entityId <= 0 || string.IsNullOrWhiteSpace(entityType))
             {
                 return BadRequest("Ungültige Anfrage.");

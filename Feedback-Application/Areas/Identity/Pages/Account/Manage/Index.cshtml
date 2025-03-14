@@ -31,7 +31,7 @@
                     <span>Admin-Einstellungen</span>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" asp-page-handler="SaveTeacherCode">
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -61,17 +61,15 @@
                 <partial name="_AdminDataTable" model="table" />
             }
 
-            <!-- Modal für das Hinzufügen -->
+            <!-- Modal für das Hinzufügen/Bearbeiten -->
             <partial name="_AdminModal" model="Model" />
-
         }
     </div>
 </div>
 
 @section Scripts {
     <script>
-
-         function setEntityTypeAndShowModal(entityType) {
+        function setEntityTypeAndShowModal(entityType) {
             document.getElementById("EntityType").value = entityType;
             document.getElementById("EntityName").value = "";
             document.getElementById("EntityId").value = 0;
