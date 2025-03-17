@@ -95,7 +95,7 @@ namespace Feedback_Application.Pages
             int erstellungsID = erstellung.ErstellungsID; // ErstellungsID holen
 
             // Radio-Button-Bewertungen sammeln
-            var ausgewählteBewertungen = Request.Form.Keys
+            var ausgewaehlteBewertungen = Request.Form.Keys
                 .Where(k => k.StartsWith("bewertung_"))
                 .Select(k => new
                 {
@@ -104,7 +104,7 @@ namespace Feedback_Application.Pages
                 })
                 .ToList();
 
-            foreach (var bewertung in ausgewählteBewertungen)
+            foreach (var bewertung in ausgewaehlteBewertungen)
             {
                 _context.Ergebnisse.Add(new Ergebnisse
                 {

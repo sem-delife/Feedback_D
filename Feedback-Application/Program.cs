@@ -5,10 +5,10 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ConnectionString für MySQL holen
+// ConnectionString fï¿½r MySQL holen
 var connectionString = builder.Configuration.GetConnectionString("FeedbackDb");
 
-// DbContext für MySQL registrieren
+// DbContext fï¿½r MySQL registrieren
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -16,14 +16,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //    options.UseSqlServer(connectionString));
 
 
-// Identity mit Rollenunterstützung registrieren
+// Identity mit Rollenunterstï¿½tzung registrieren
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
     options.User.RequireUniqueEmail = false;
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders(); // Token für Passwort-Reset etc.
+    .AddDefaultTokenProviders(); // Token fï¿½r Passwort-Reset etc.
 
 builder.Services.AddRazorPages();
 
@@ -47,6 +47,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-app.MapControllers(); // WICHTIG für Identity-Routen
+app.MapControllers(); // WICHTIG fï¿½r Identity-Routen
 
 app.Run();
