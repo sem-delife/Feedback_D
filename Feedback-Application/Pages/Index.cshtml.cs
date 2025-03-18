@@ -18,8 +18,7 @@ public class IndexModel : PageModel
         _context = context;
     }
 
-    [BindProperty]
-    public string UserID { get; set; }
+    public string? UserID { get; set; }
 
     [BindProperty, Required(ErrorMessage = "Bitte eine Klasse auswählen.")]
     public int SelectedClass { get; set; }
@@ -75,23 +74,35 @@ public class IndexModel : PageModel
 
         try
         {
-            // Die richtige FeedbackID aus der DB holen
+            // Benutzer-ID sicher aus Identity holen**
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Forbid(); // Falls kein Benutzer angemeldet ist, Zugriff verweigern
+            }
+
+            Console.WriteLine($"UserID aus Identity: {userId}");
+
+            //Die richtige FeedbackID aus der DB holen**
             var feedbackbogen = await _context.Feedbackbogen.FirstOrDefaultAsync();
             if (feedbackbogen == null)
             {
                 return BadRequest("Kein Feedbackbogen gefunden.");
             }
 
+            //Erstellung-Objekt mit richtiger UserID füllen**
             var erstellt = new Erstellung
             {
                 FeedbackID = feedbackbogen.BogenID, // **Fix: Richtige FeedbackID setzen**
-                UserID = UserID,
+                UserID = userId, // UserID direkt setzen!**
                 KlassenID = SelectedClass,
                 Jahrgang = SelectedYear,
                 Schuljahr = SchoolYear,
                 AbteilungsID = Abteilung,
                 FachID = Fach,
-                Code = Code
+                Code = Code,
+                Erstellungsdatum = DateTime.UtcNow // Optional: Erstellungsdatum setzen
             };
 
             _context.Erstellung.Add(erstellt);
@@ -105,4 +116,5 @@ public class IndexModel : PageModel
             return Page();
         }
     }
+
 }
