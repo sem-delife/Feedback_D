@@ -1,44 +1,55 @@
 ﻿@model Feedback_Application.Areas.Identity.Pages.Account.Manage.Models.AdminDataTableViewModel
 
-<h3>@Model.Title</h3>
+<div class="accordion" id="accordion-@Model.Title">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-@Model.Title">
+            <button class="accordion-button collapsed d-flex justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@Model.Title" aria-expanded="false" aria-controls="collapse-@Model.Title">
+                <span>@Model.Title</span>
+            </button>
+        </h2>
 
-<!-- Button zum Hinzufügen -->
-<button class="btn btn-success mb-3" onclick="setEntityTypeAndShowModal('@Model.Title')">Hinzufügen</button>
+        <div id="collapse-@Model.Title" class="accordion-collapse collapse" aria-labelledby="heading-@Model.Title" data-bs-parent="#accordion-@Model.Title">
+            <div class="accordion-body d-flex flex-column">
+                <button type="button" class="btn btn-success btn-sm" onclick="openAddEntityModal('@Model.Title')">
+                    <i class="bi bi-plus-lg"></i> Hinzufügen
+                </button>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>ID</th>
-            <th>Aktionen</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
-            var type = item.GetType();
-            var nameValue = type.GetProperty(Model.NameField)?.GetValue(item, null);
-            var idValue = type.GetProperty(Model.IdField)?.GetValue(item, null);
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="text-end">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            var id = item.GetType().GetProperty(Model.IdField)?.GetValue(item);
+                            var name = item.GetType().GetProperty(Model.NameField)?.GetValue(item);
 
-            <tr>
-                <td>@nameValue</td>
-                <td>@idValue</td>
-                <td>
-                    <form method="post">
-                        <input type="hidden" name="EntityId" value="@idValue" />
-                        <input type="hidden" name="EntityType" value="@Model.Title" />
+                            <tr>
+                                <td>@name</td>
+                                <td class="text-end">
+                                    <!-- Bearbeiten-Button öffnet Edit-Modal -->
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="openEditEntityModal('@id', '@name', '@Model.Title')">
+                                        <i class="bi bi-pencil"></i> Bearbeiten
+                                    </button>
 
-                        <button type="button" class="btn btn-warning btn-sm"
-                                onclick="setEditEntity('@idValue', '@nameValue', '@Model.Title')">
-                            Bearbeiten
-                        </button>
-                        <button type="submit" class="btn btn-danger btn-sm" asp-page-handler="DeleteEntity"
-                                onclick="return confirm('Willst du das wirklich löschen?');">
-                            Löschen
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                    <!-- Löschen-Button -->
+                                    <form method="post" asp-page-handler="DeleteEntity" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="entityId" value="@id" />
+                                        <input type="hidden" name="entityType" value="@Model.Title" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bist du sicher, dass du dieses Element löschen möchtest?');">
+                                            <i class="bi bi-trash"></i> Löschen
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
