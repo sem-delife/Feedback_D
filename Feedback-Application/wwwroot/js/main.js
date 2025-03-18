@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Die Formularfelder setzen
-            document.getElementById('UserID').value = document.getElementById('userHiddenId')?.value || 1;
             document.getElementById('selectedClass').value = selectedClass;
             document.getElementById('selectedYear').value = selectedYear;
             document.getElementById('schoolYearInput').value = selectedSchoolYear;
@@ -85,7 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('generatedCodeInput').value = generatedCodeValue;
 
             console.log("Form wird abgeschickt mit:", {
-                UserID: document.getElementById('UserID').value,
                 SelectedClass: document.getElementById('selectedClass').value,
                 SelectedYear: document.getElementById('selectedYear').value,
                 SchoolYear: document.getElementById('schoolYearInput').value,

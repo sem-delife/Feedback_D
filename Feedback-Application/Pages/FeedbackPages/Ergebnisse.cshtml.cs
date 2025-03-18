@@ -22,6 +22,30 @@ namespace Feedback_Application.Pages.FeedbackPages
 
         public async Task<IActionResult> OnGetAsync()
         {
+            var userGuid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var isAdmin = User.IsInRole("Admin");
+
+            if (string.IsNullOrEmpty(userGuid))
+            {
+                return Forbid();
+            }
+
+            Console.WriteLine($"Aktuelle Benutzer-GUID: {userGuid} (Admin: {isAdmin})");
+
+            var userEntity = await _context.Users
+                .Where(u => u.Id == userGuid)
+                .Select(u => new { IntId = u.Id }) // Falls es eine andere Spalte gibt, hier anpassen
+                .FirstOrDefaultAsync();
+
+            if (userEntity == null && !isAdmin)
+            {
+                return Forbid(); // Falls kein Benutzer gefunden wird und er kein Admin ist
+            }
+
+            var userIntId = userEntity?.IntId; // Falls null, bleibt es null
+
+            Console.WriteLine($"Gemappte User-IntID: {userIntId}");
+
             var rawData = await (
                 from e in _context.Erstellung
                 join f in _context.Feedbackbogen on e.FeedbackID equals f.BogenID
@@ -31,7 +55,7 @@ namespace Feedback_Application.Pages.FeedbackPages
                 from aussage in aussagenGroup.DefaultIfEmpty()
                 join b in _context.Bewertungen on ergebnis.BewertungsID equals b.BewertungsID into bewertungenGroup
                 from bewertung in bewertungenGroup.DefaultIfEmpty()
-                where e.ErstellungsID != null // Stellt sicher, dass nur existierende Erstellungen geladen werden
+                where isAdmin || e.UserID == userIntId 
                 select new
                 {
                     e.ErstellungsID,
@@ -42,7 +66,8 @@ namespace Feedback_Application.Pages.FeedbackPages
                 }
             ).ToListAsync();
 
-            // Gruppierung nach Feedbackbögen
+            Console.WriteLine($"Gefundene Umfragen: {rawData.Count}");
+
             FeedbackErgebnisse = rawData
                 .GroupBy(x => new { x.ErstellungsID, x.FeedbackTitel, x.Erstellungsdatum })
                 .Select(g => new FeedbackErgebnisViewModel
@@ -51,7 +76,7 @@ namespace Feedback_Application.Pages.FeedbackPages
                     FeedbackTitel = g.Key.FeedbackTitel,
                     Erstellungsdatum = g.Key.Erstellungsdatum,
                     Ergebnisse = g
-                        .Where(x => x.Aussage != null) // Falls keine Aussage, ignorieren
+                        .Where(x => x.Aussage != null)
                         .GroupBy(x => x.Aussage)
                         .Select(grp => new FeedbackAussageErgebnis
                         {
@@ -67,6 +92,11 @@ namespace Feedback_Application.Pages.FeedbackPages
 
             return Page();
         }
+
+
+
+
+
     }
 
     public class FeedbackErgebnisViewModel

@@ -15,7 +15,7 @@ namespace Feedback_Application.Pages.Models
 
         [Required]
         [ForeignKey("AspNetUsers")]
-        public string? UserID { get; set; } // Benutzer ID, optional (nullable)
+        public string UserID { get; set; } // Benutzer ID, optional (nullable)
 
         [ForeignKey("Klassen")]
         public int KlassenID { get; set; } // KlassenID
