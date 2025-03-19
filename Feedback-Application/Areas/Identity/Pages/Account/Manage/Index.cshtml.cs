@@ -14,13 +14,16 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public IndexModel(UserManager<IdentityUser> userManager, ApplicationDbContext context)
+        public IndexModel(UserManager<IdentityUser> userManager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _context = context;
+            _roleManager = roleManager;
         }
 
+        [BindProperty]
         public string Username { get; set; }
         [TempData] public string StatusMessage { get; set; }
 
@@ -209,6 +212,44 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             {
                 await _context.SaveChangesAsync();
             }
+
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostMakeAdminAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                StatusMessage = "Fehler: Benutzername darf nicht leer sein.";
+                return Page();
+            }
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                StatusMessage = $"Fehler: Benutzer \"{username}\" nicht gefunden.";
+                return Page();
+            }
+
+            // Überprüfen, ob die Rolle existiert, falls nicht, erstellen
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            // Prüfen, ob der Benutzer bereits Admin ist
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                StatusMessage = $"Der Benutzer \"{username}\" ist bereits ein Admin.";
+                return Page();
+            }
+
+            // Benutzer zur Admin-Rolle hinzufügen
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+
+            StatusMessage = result.Succeeded
+                ? $"Benutzer \"{username}\" ist jetzt Admin."
+                : "Fehler beim Zuweisen der Admin-Rolle.";
 
             return RedirectToPage();
         }
