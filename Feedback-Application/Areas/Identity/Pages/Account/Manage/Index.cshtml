@@ -13,8 +13,8 @@
 <partial name="_StatusMessage" for="StatusMessage" />
 
 <div class="row">
-    <!--  Linke Spalte: Benutzerprofil -->
-    <div class="col-md-6">
+    <!-- Linke Spalte: Benutzerprofil & Admin hinzufügen -->
+    <div class="col-md-6 my-3">
         <form id="profile-form" method="post">
             <div class="form-group">
                 <label asp-for="Username" class="form-label"></label>
@@ -34,7 +34,8 @@
                 </button>
             </form>
         </div>
-        <!-- Neuer Bereich: Admin hinzufügen -->
+
+        <!-- Admin hinzufügen Bereich -->
         @if (User.IsInRole("Admin"))
         {
             <div class="mt-4 p-3 border rounded bg-light">
@@ -45,8 +46,9 @@
                     @Html.AntiForgeryToken()
 
                     <div class="mb-3">
-                        <label for="usernameInput" class="form-label">Benutzername</label>
-                        <input type="text" id="usernameInput" name="username" class="form-control" required />
+                        <label asp-for="AdminUsername" class="form-label">Benutzername</label>
+                        <input asp-for="AdminUsername" class="form-control" required autocomplete="off" />
+                        <span asp-validation-for="AdminUsername" class="text-danger"></span>
                     </div>
 
                     <button type="button" class="btn btn-success w-100" onclick="confirmAdminPromotion()">
@@ -57,8 +59,8 @@
         }
     </div>
 
-    <!--  Rechte Spalte: Admin-Einstellungen (nur für Admins sichtbar) -->
-    <div class="col-md-6">
+    <!-- Rechte Spalte: Admin-Einstellungen -->
+    <div class="col-md-6 my-5">
         @if (User.IsInRole("Admin"))
         {
             <div class="card shadow-sm border-0 mb-4">
@@ -83,21 +85,16 @@
                             <i class="bi bi-save"></i> Speichern
                         </button>
                     </form>
-
-                    @if (!string.IsNullOrEmpty(Model.StatusMessage))
-                    {
-                        <div class="alert alert-success mt-3">@Model.StatusMessage</div>
-                    }
                 </div>
             </div>
 
-            <!--  Tabellen für Klassen, Fächer und Abteilungen -->
+            <!-- Tabellen für Klassen, Fächer und Abteilungen -->
             @foreach (var table in Model.DataTables)
             {
                 <partial name="_AdminDataTable" model="table" />
             }
 
-            <!--  Modal für das Hinzufügen/Bearbeiten -->
+            <!-- Modal für das Hinzufügen/Bearbeiten -->
             <partial name="_AdminModal" model="Model" />
         }
     </div>
@@ -105,25 +102,10 @@
 
 @section Scripts {
     <script>
-        window.openAddEntityModal = function(entityType) {
-            document.getElementById("AddEntityType").value = entityType;
-            document.getElementById("AddEntityName").value = "";
+         function confirmAdminPromotion() {
+            var inputField = document.querySelector("[name='AdminUsername']");
+            var username = inputField.value;
 
-            var modal = new bootstrap.Modal(document.getElementById("addEntityModal"));
-            modal.show();
-        };
-
-        window.openEditEntityModal = function(id, name, type) {
-            document.getElementById("EditEntityId").value = id;
-            document.getElementById("EditEntityName").value = name;
-            document.getElementById("EditEntityType").value = type;
-
-            var modal = new bootstrap.Modal(document.getElementById("editEntityModal"));
-            modal.show();
-        };
-
-        function confirmAdminPromotion() {
-            var username = document.getElementById("usernameInput").value;
             if (!username) {
                 alert("Bitte geben Sie einen Benutzernamen ein!");
                 return;
@@ -132,7 +114,27 @@
             var confirmAction = confirm(`Wollen Sie wirklich ${username} zum Admin befördern?`);
             if (confirmAction) {
                 document.getElementById("adminPromotionForm").submit();
+                setTimeout(() => inputField.value = "", 500); // Löscht den Input nach dem Absenden
             }
         }
+
+        window.openAddEntityModal = function(entityType) {
+            console.log("openAddEntityModal aufgerufen mit Typ:", entityType);
+            document.getElementById("AddEntityType").value = entityType;
+            document.getElementById("AddEntityName").value = "";
+
+            var modal = new bootstrap.Modal(document.getElementById("addEntityModal"));
+            modal.show();
+        };
+
+        window.openEditEntityModal = function(id, name, type) {
+            console.log("openEditEntityModal aufgerufen mit:", id, name, type);
+            document.getElementById("EditEntityId").value = id;
+            document.getElementById("EditEntityName").value = name;
+            document.getElementById("EditEntityType").value = type;
+
+            var modal = new bootstrap.Modal(document.getElementById("editEntityModal"));
+            modal.show();
+        };
     </script>
 }

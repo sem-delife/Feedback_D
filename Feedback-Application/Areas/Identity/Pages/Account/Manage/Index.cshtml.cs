@@ -23,14 +23,25 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             _roleManager = roleManager;
         }
 
-        [BindProperty]
-        public string Username { get; set; }
-        [TempData] public string StatusMessage { get; set; }
+        public string Username { get; set; } // Nur für Anzeige
 
-        [BindProperty(SupportsGet = true)] public string? TeacherCode { get; set; }
-        [BindProperty] public string? EntityType { get; set; }
-        [BindProperty] public string? EntityName { get; set; }
-        [BindProperty] public int? EntityId { get; set; }
+        [BindProperty]
+        public string? AdminUsername { get; set; } // Für Admin-Beförderung
+
+        [TempData]
+        public string StatusMessage { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? TeacherCode { get; set; }
+
+        [BindProperty]
+        public string? EntityType { get; set; }
+
+        [BindProperty]
+        public string? EntityName { get; set; }
+
+        [BindProperty]
+        public int? EntityId { get; set; }
 
         public List<AdminDataTableViewModel> DataTables { get; set; } = new();
 
@@ -76,9 +87,45 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
+        public async Task<IActionResult> OnPostMakeAdminAsync()
+        {
+            ModelState.Clear();
+
+            if (string.IsNullOrWhiteSpace(AdminUsername))
+            {
+                StatusMessage = "Fehler: Benutzername darf nicht leer sein.";
+                return RedirectToPage();
+            }
+
+            var user = await _userManager.FindByNameAsync(AdminUsername);
+            if (user == null)
+            {
+                StatusMessage = $"Fehler: Benutzer \"{AdminUsername}\" nicht gefunden.";
+                return RedirectToPage();
+            }
+
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            if (await _userManager.IsInRoleAsync(user, "Admin"))
+            {
+                StatusMessage = $"Der Benutzer \"{AdminUsername}\" ist bereits ein Admin.";
+                return RedirectToPage();
+            }
+
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+
+            StatusMessage = result.Succeeded
+                ? $"Benutzer \"{AdminUsername}\" ist jetzt Admin."
+                : "Fehler beim Zuweisen der Admin-Rolle.";
+
+            return RedirectToPage();
+        }
+
         public async Task<IActionResult> OnPostSaveTeacherCodeAsync()
         {
-            // Nur TeacherCode validieren
             ModelState.Clear();
             if (string.IsNullOrWhiteSpace(TeacherCode))
             {
@@ -105,8 +152,8 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAddEntityAsync()
         {
-            // Nur die Felder für Entitäten validieren
             ModelState.Clear();
+
             if (string.IsNullOrWhiteSpace(EntityName))
             {
                 ModelState.AddModelError("", "Der Name darf nicht leer sein.");
@@ -132,12 +179,12 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             }
 
             await _context.SaveChangesAsync();
+            StatusMessage = $"{EntityType} erfolgreich hinzugefügt!";
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostEditEntityAsync()
         {
-            // Nur die Felder für Bearbeiten validieren
             ModelState.Clear();
             if (EntityId == null || EntityId <= 0 || string.IsNullOrWhiteSpace(EntityName))
             {
@@ -179,12 +226,12 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
             }
 
             await _context.SaveChangesAsync();
+            StatusMessage = $"{EntityType} erfolgreich bearbeitet!";
             return RedirectToPage();
         }
 
         public async Task<IActionResult> OnPostDeleteEntityAsync(int entityId, string entityType)
         {
-            // Keine Validierung auf ModelState, nur Basisprüfung
             if (entityId <= 0 || string.IsNullOrWhiteSpace(entityType))
             {
                 return BadRequest("Ungültige Anfrage.");
@@ -213,44 +260,7 @@ namespace Feedback_Application.Areas.Identity.Pages.Account.Manage
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnPostMakeAdminAsync(string username)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                StatusMessage = "Fehler: Benutzername darf nicht leer sein.";
-                return Page();
-            }
-
-            var user = await _userManager.FindByNameAsync(username);
-            if (user == null)
-            {
-                StatusMessage = $"Fehler: Benutzer \"{username}\" nicht gefunden.";
-                return Page();
-            }
-
-            // Überprüfen, ob die Rolle existiert, falls nicht, erstellen
-            if (!await _roleManager.RoleExistsAsync("Admin"))
-            {
-                await _roleManager.CreateAsync(new IdentityRole("Admin"));
-            }
-
-            // Prüfen, ob der Benutzer bereits Admin ist
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
-            {
-                StatusMessage = $"Der Benutzer \"{username}\" ist bereits ein Admin.";
-                return Page();
-            }
-
-            // Benutzer zur Admin-Rolle hinzufügen
-            var result = await _userManager.AddToRoleAsync(user, "Admin");
-
-            StatusMessage = result.Succeeded
-                ? $"Benutzer \"{username}\" ist jetzt Admin."
-                : "Fehler beim Zuweisen der Admin-Rolle.";
-
+            StatusMessage = $"{entityType} erfolgreich gelöscht!";
             return RedirectToPage();
         }
     }
