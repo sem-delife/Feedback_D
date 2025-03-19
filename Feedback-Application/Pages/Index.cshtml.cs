@@ -12,13 +12,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _context;
-
     public IndexModel(ApplicationDbContext context)
     {
         _context = context;
     }
 
+
     public string? UserID { get; set; }
+
+    [BindProperty]
+    public string CodeDB { get; set; }
+    [BindProperty]
+    public int SelectedForm { get; set; } // Speichert den gewählten Radio-Button
 
     [BindProperty, Required(ErrorMessage = "Bitte eine Klasse auswählen.")]
     public int SelectedClass { get; set; }
@@ -67,11 +72,6 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return Page(); // Falls Fehler auftreten, Modal bleibt offen
-        }
-
         try
         {
             // Benutzer-ID sicher aus Identity holen**
@@ -85,16 +85,18 @@ public class IndexModel : PageModel
             Console.WriteLine($"UserID aus Identity: {userId}");
 
             //Die richtige FeedbackID aus der DB holen**
-            var feedbackbogen = await _context.Feedbackbogen.FirstOrDefaultAsync();
-            if (feedbackbogen == null)
-            {
-                return BadRequest("Kein Feedbackbogen gefunden.");
-            }
+            //var feedbackbogen = await _context.Feedbackbogen.FirstOrDefaultAsync();
+            //if (feedbackbogen == null)
+            //{
+            //    return BadRequest("Kein Feedbackbogen gefunden.");
+            //}
+
+            
 
             //Erstellung-Objekt mit richtiger UserID füllen**
             var erstellt = new Erstellung
             {
-                FeedbackID = feedbackbogen.BogenID, // **Fix: Richtige FeedbackID setzen**
+                FeedbackID = SelectedForm, // **Fix: Richtige FeedbackID setzen**
                 UserID = userId, // UserID direkt setzen!**
                 KlassenID = SelectedClass,
                 Jahrgang = SelectedYear,
@@ -116,5 +118,51 @@ public class IndexModel : PageModel
             return Page();
         }
     }
+
+
+    
+    public async Task<IActionResult> OnPostSubmitCodeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(CodeDB))
+        {
+            TempData["ErrorMessage"] = "Bitte geben Sie einen Code ein.";
+            return RedirectToPage("/Index"); // Nach Redirect bleibt die Fehlermeldung erhalten
+            //ModelState.AddModelError(string.Empty, "Bitte geben Sie einen Code ein.");
+            //return Page();
+        }
+
+        var feedbackEntry = await _context.Erstellung
+            .Where(e => e.Code == CodeDB)
+            .Select(e => (int?)e.FeedbackID) // Wichtig: castet zu nullable int (int?)
+            .FirstOrDefaultAsync();
+
+        if (feedbackEntry == null) // Falls kein Eintrag gefunden wurde
+        {
+            //ModelState.AddModelError(string.Empty, "Code nicht gefunden.");
+            TempData["ErrorMessage"] = "Der eingegebene Code wurde nicht gefunden.";
+            return Redirect("/Index");
+        }
+
+        // Umleiten basierend auf der FeedbackID
+        if (feedbackEntry == 1)
+        {
+            return Redirect($"/FeedbackPages/FirstFeedbackPages?Code={Uri.EscapeDataString(CodeDB)}");
+        }
+        else if (feedbackEntry == 2)
+        {
+            return Redirect($"/FeedbackPages/Zielscheibe?Code={Uri.EscapeDataString(CodeDB)}");
+        }
+        else if (feedbackEntry == 3)
+        {
+            return Redirect($"/FeedbackPages/SmileyFeedback?Code={Uri.EscapeDataString(CodeDB)}");
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Ein unbekannter Fehler ist aufgetreten.";
+            return RedirectToPage("/Index");
+        }
+    }
+
+
 
 }

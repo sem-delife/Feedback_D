@@ -1,0 +1,51 @@
+﻿@page
+@model Feedback_Application.Pages.FeedbackReportModel
+@{
+    ViewData["Title"] = "Feedbackbogen Zielscheibe";
+}
+
+<link rel="stylesheet" href="/css/feedback_styles.css">
+
+<div class="feedback-container">
+    <h3>Zielscheiben Feedback</h3>
+    <p>Bitte bewerten Sie die folgenden Aussagen, indem Sie ein Kreuz in der Zielscheibe setzen. Je näher zur Mitte, desto positiver die Bewertung.</p>
+
+    <form method="post">
+        <input type="hidden" asp-for="Code" />
+
+        <div class="zielscheibe-wrapper">
+            <div class="zielscheibe-container">
+                <img src="/images/zielscheibe.png" alt="Zielscheibe" class="zielscheibe-image">
+                @foreach (var aussage in Model.Aussagen)
+                {
+                    <div class="zielscheibe-label" style="position: absolute;">
+                        <span>@aussage.Aussage</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="bewertungsbereich">
+            @foreach (var aussage in Model.Aussagen)
+            {
+                <div class="bewertung-item">
+                    <label>@aussage.Aussage</label>
+                    <div class="bewertung-options">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <input type="radio" name="bewertung_@aussage.AussageID" value="@i" required />
+                            <label>@i</label>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="extra-feedback">
+            <label>Was ich sonst noch anmerken möchte:</label>
+            <textarea name="extra_feedback"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Absenden</button>
+    </form>
+</div>

@@ -196,6 +196,54 @@ namespace Feedback_Application.Migrations
                             AussageID = 23,
                             Aussage = "Die Bewertungen sind nachvollziehbar und verstaendlich.",
                             ThemaID = 4
+                        },
+                        new
+                        {
+                            AussageID = 24,
+                            Aussage = "Die Lehrkraft hat ein großes Hintergrundwissen.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 25,
+                            Aussage = "Die Lehrkraft ist immer gut vorbereitet.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 26,
+                            Aussage = "Die Lehrkraft zeigt Interesse an ihren Schuelern.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 27,
+                            Aussage = "Die Lehrkraft sorgt fuer ein gutes Lernklima in der Klasse.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 28,
+                            Aussage = "Die Notengebung ist fair und nachvollziehbar.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 29,
+                            Aussage = "Ich konnte dem Unterricht immer gut folgen.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 30,
+                            Aussage = "Der Unterricht wird vielfaeltig gestaltet.",
+                            ThemaID = 5
+                        },
+                        new
+                        {
+                            AussageID = 31,
+                            Aussage = "Ich lerne im Unterricht viel.",
+                            ThemaID = 5
                         });
                 });
 
@@ -249,6 +297,41 @@ namespace Feedback_Application.Migrations
                             BewertungsChar = "trifft ueberhaupt nicht zu",
                             BewertungsInt = 1,
                             BogenID = 1
+                        },
+                        new
+                        {
+                            BewertungsID = 5,
+                            BewertungsChar = "",
+                            BewertungsInt = 1,
+                            BogenID = 2
+                        },
+                        new
+                        {
+                            BewertungsID = 6,
+                            BewertungsChar = "",
+                            BewertungsInt = 2,
+                            BogenID = 2
+                        },
+                        new
+                        {
+                            BewertungsID = 7,
+                            BewertungsChar = "",
+                            BewertungsInt = 3,
+                            BogenID = 2
+                        },
+                        new
+                        {
+                            BewertungsID = 8,
+                            BewertungsChar = "",
+                            BewertungsInt = 4,
+                            BogenID = 2
+                        },
+                        new
+                        {
+                            BewertungsID = 9,
+                            BewertungsChar = "",
+                            BewertungsInt = 5,
+                            BogenID = 2
                         });
                 });
 
@@ -359,6 +442,12 @@ namespace Feedback_Application.Migrations
                             FragenID = 3,
                             BogenID = 1,
                             Frage = "Verbesserungsvorschlaege:"
+                        },
+                        new
+                        {
+                            FragenID = 4,
+                            BogenID = 2,
+                            Frage = "Was ich sonst noch anmerken moechte: "
                         });
                 });
 
@@ -400,6 +489,11 @@ namespace Feedback_Application.Migrations
                         {
                             BogenID = 1,
                             Beschreibung = "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I"
+                        },
+                        new
+                        {
+                            BogenID = 2,
+                            Beschreibung = "Zielscheibe"
                         });
                 });
 
@@ -463,6 +557,12 @@ namespace Feedback_Application.Migrations
                             ThemaID = 4,
                             BogenID = 1,
                             Thema = "Bewerten Sie folgende Behauptungen:"
+                        },
+                        new
+                        {
+                            ThemaID = 5,
+                            BogenID = 2,
+                            Thema = "Bewertung"
                         });
                 });
 

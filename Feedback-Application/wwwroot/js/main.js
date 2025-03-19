@@ -20,27 +20,27 @@ function setGeneratedCode(elementId) {
 }
 
 // Funktion zum Weiterleiten zur Feedback-Seite mit Code
-function redirectToPage() {
-    let inputField = document.getElementById("codeInput");
-    if (!inputField) return;
+//function redirectToPage() {
+//    let inputField = document.getElementById("codeInput");
+//    if (!inputField) return;
 
-    let code = inputField.value.trim();
-    if (code) {
-        window.location.href = `/FeedbackPages/FirstFeedbackPages?Code=${encodeURIComponent(code)}`;
-    }
-}
+//    let code = inputField.value.trim();
+//    if (code) {
+//        window.location.href = `/FeedbackPages/FirstFeedbackPages?Code=${encodeURIComponent(code)}`;
+//    }
+//}
 
 // Event-Listener für ENTER-Taste im Code-Input-Feld
 document.addEventListener('DOMContentLoaded', function () {
-    let inputField = document.getElementById("codeInput");
-    if (inputField) {
-        inputField.addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Verhindert das Standard-Submit-Verhalten
-                redirectToPage(); // Feedback-Bogen öffnen
-            }
-        });
-    }
+//    let inputField = document.getElementById("codeInput");
+//    if (inputField) {
+//        inputField.addEventListener("keypress", function (event) {
+//            if (event.key === "Enter") {
+//                event.preventDefault(); // Verhindert das Standard-Submit-Verhalten
+//                redirectToPage(); // Feedback-Bogen öffnen
+//            }
+//        });
+//    }
 
     setGeneratedCode('generatedCode');
 
@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateStep();
         } else {
             // Validierung vor dem Absenden
+            //let SelectedForm = document.getElementById('SelectedFormHidden').value;
             let selectedClass = document.getElementById('classDropdown').value;
             let selectedYear = document.getElementById('yearDropdown').value;
             let selectedSchoolYear = document.getElementById('schoolYear').value;
@@ -74,8 +75,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert("Bitte füllen Sie alle Felder aus, bevor Sie fortfahren.");
                 return;
             }
-
+            var selectedRadio = document.querySelector('input[name="SelectedForm"]:checked');
+            if (selectedRadio) {
+                document.getElementById("SelectedFormHidden").value = selectedRadio.value;
+            }
             // Die Formularfelder setzen
+            //document.getElementById('SelectedFormHidden').value = SelectedForm;
             document.getElementById('selectedClass').value = selectedClass;
             document.getElementById('selectedYear').value = selectedYear;
             document.getElementById('schoolYearInput').value = selectedSchoolYear;
