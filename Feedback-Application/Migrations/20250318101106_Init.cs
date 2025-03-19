@@ -128,7 +128,8 @@ namespace Feedback_Application.Migrations
                     FeedbackID = table.Column<int>(type: "int", nullable: false),
                     AussageID = table.Column<int>(type: "int", nullable: false),
                     BewertungsID = table.Column<int>(type: "int", nullable: false),
-                    VarErgebnisID = table.Column<int>(type: "int", nullable: true)
+                    VarErgebnisID = table.Column<int>(type: "int", nullable: true),
+                    ErstellungsID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +260,7 @@ namespace Feedback_Application.Migrations
                     VarErgebnisID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     FragenID = table.Column<int>(type: "int", nullable: false),
-                    FeedbackID = table.Column<int>(type: "int", nullable: false),
+                    ErstellungsID = table.Column<int>(type: "int", nullable: false),
                     AntwortUser = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -423,7 +424,15 @@ namespace Feedback_Application.Migrations
                     { 20, "Der Stoff wird ausreichend wiederholt und geuebt.", 3 },
                     { 21, "Die Themen der Schulaufgaben werden rechtzeitig vorher bekannt gegeben.", 4 },
                     { 22, "Der Schwierigkeitsgrad der Leistungsnachweise entspricht dem der Unterrichtsinhalte.", 4 },
-                    { 23, "Die Bewertungen sind nachvollziehbar und verstaendlich.", 4 }
+                    { 23, "Die Bewertungen sind nachvollziehbar und verstaendlich.", 4 },
+                    { 24, "Die Lehrkraft hat ein großes Hintergrundwissen.", 5 },
+                    { 25, "Die Lehrkraft ist immer gut vorbereitet.", 5 },
+                    { 26, "Die Lehrkraft zeigt Interesse an ihren Schuelern.", 5 },
+                    { 27, "Die Lehrkraft sorgt fuer ein gutes Lernklima in der Klasse.", 5 },
+                    { 28, "Die Notengebung ist fair und nachvollziehbar.", 5 },
+                    { 29, "Ich konnte dem Unterricht immer gut folgen.", 5 },
+                    { 30, "Der Unterricht wird vielfaeltig gestaltet.", 5 },
+                    { 31, "Ich lerne im Unterricht viel.", 5 }
                 });
 
             migrationBuilder.InsertData(
@@ -434,7 +443,12 @@ namespace Feedback_Application.Migrations
                     { 1, "trifft voellig zu", 4, 1 },
                     { 2, "trifft eher zu", 3, 1 },
                     { 3, "trifft eher nicht zu", 2, 1 },
-                    { 4, "trifft ueberhaupt nicht zu", 1, 1 }
+                    { 4, "trifft ueberhaupt nicht zu", 1, 1 },
+                    { 5, "", 1, 2 },
+                    { 6, "", 2, 2 },
+                    { 7, "", 3, 2 },
+                    { 8, "", 4, 2 },
+                    { 9, "", 5, 2 }
                 });
 
             migrationBuilder.InsertData(
@@ -444,13 +458,18 @@ namespace Feedback_Application.Migrations
                 {
                     { 1, 1, "Das hat mir besonders gut gefallen:" },
                     { 2, 1, "Das hat mir nicht gefallen:" },
-                    { 3, 1, "Verbesserungsvorschlaege:" }
+                    { 3, 1, "Verbesserungsvorschlaege:" },
+                    { 4, 2, "Was ich sonst noch anmerken moechte: " }
                 });
 
             migrationBuilder.InsertData(
                 table: "Feedbackbogen",
                 columns: new[] { "BogenID", "Beschreibung" },
-                values: new object[] { 1, "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I" });
+                values: new object[,]
+                {
+                    { 1, "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I" },
+                    { 2, "Zielscheibe" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Oberthema",
@@ -460,7 +479,8 @@ namespace Feedback_Application.Migrations
                     { 1, 1, "Verhalten des Lehrers:" },
                     { 2, 1, "Bewerten Sie folgende Aussagen:" },
                     { 3, 1, "Wie ist der Unterricht?" },
-                    { 4, 1, "Bewerten Sie folgende Behauptungen:" }
+                    { 4, 1, "Bewerten Sie folgende Behauptungen:" },
+                    { 5, 2, "Bewertung" }
                 });
 
             migrationBuilder.InsertData(
