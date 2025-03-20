@@ -19,21 +19,16 @@
             <tr>
                 @if (Model.ExtraFeedbacks.Any())
                 {
-                    <td style="border: 2px solid black; padding: 20px;">
-                    <div class="extra-feedback">
-
-                        <ul>
                             @foreach (var extra in Model.ExtraFeedbacks)
                             {
-                      
-                                <li>
-                                    <label><b>@extra.Frage</b></label>
-        <textarea name="extra_feedback_@extra.FragenID"></textarea>
-                                </li>
+                                                    <td style="border: 2px solid black; padding: 20px;">
+                    <div class="extra-feedback">
+                             <textarea class = "feedback-textarea" placeholder="..."name="extra_feedback_@extra.FragenID"></textarea>
+
+                            </div>
+                        </td>
                             }
-                        </ul>
-                    </div>
-                    </td>
+                  
 
                 }
               @*   <td style="border: 2px solid black; padding: 20px;">

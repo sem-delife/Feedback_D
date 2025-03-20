@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250319130323_Init")]
-    partial class Init
+    [Migration("20250320091221_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -448,6 +448,18 @@ namespace Feedback_Application.Migrations
                             FragenID = 4,
                             BogenID = 2,
                             Frage = "Was ich sonst noch anmerken moechte: "
+                        },
+                        new
+                        {
+                            FragenID = 5,
+                            BogenID = 3,
+                            Frage = "Pro"
+                        },
+                        new
+                        {
+                            FragenID = 6,
+                            BogenID = 3,
+                            Frage = "Contra"
                         });
                 });
 
@@ -494,6 +506,11 @@ namespace Feedback_Application.Migrations
                         {
                             BogenID = 2,
                             Beschreibung = "Zielscheibe"
+                        },
+                        new
+                        {
+                            BogenID = 3,
+                            Beschreibung = "Smiley"
                         });
                 });
 

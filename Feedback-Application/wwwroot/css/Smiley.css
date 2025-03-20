@@ -33,11 +33,11 @@ form {
     }
 
 .feedback-textarea {
-    width: 650px;
-    height: 100px;
+    width: 100%;
+    height: 100%;
     resize: none;
     border: 1px solid #ccc;
-    padding: 8px;
+    /* padding: 8px; */
     font-size: 14px;
 }
 
@@ -57,4 +57,9 @@ button {
 
 tbody {
     height: 180px;
+}
+
+.extra-feedback {
+    width: 100%;
+    height: 35svh;
 }
