@@ -128,7 +128,6 @@ namespace Feedback_Application.Migrations
                     FeedbackID = table.Column<int>(type: "int", nullable: false),
                     AussageID = table.Column<int>(type: "int", nullable: false),
                     BewertungsID = table.Column<int>(type: "int", nullable: false),
-                    VarErgebnisID = table.Column<int>(type: "int", nullable: true),
                     ErstellungsID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -440,10 +439,10 @@ namespace Feedback_Application.Migrations
                 columns: new[] { "BewertungsID", "BewertungsChar", "BewertungsInt", "BogenID" },
                 values: new object[,]
                 {
-                    { 1, "trifft voellig zu", 4, 1 },
-                    { 2, "trifft eher zu", 3, 1 },
-                    { 3, "trifft eher nicht zu", 2, 1 },
-                    { 4, "trifft ueberhaupt nicht zu", 1, 1 },
+                    { 1, "trifft voellig zu", 0, 1 },
+                    { 2, "trifft eher zu", 0, 1 },
+                    { 3, "trifft eher nicht zu", 0, 1 },
+                    { 4, "trifft ueberhaupt nicht zu", 0, 1 },
                     { 5, "", 1, 2 },
                     { 6, "", 2, 2 },
                     { 7, "", 3, 2 },
