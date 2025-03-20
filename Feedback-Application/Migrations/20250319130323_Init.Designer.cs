@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250318101106_Init")]
+    [Migration("20250319130323_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -277,28 +277,28 @@ namespace Feedback_Application.Migrations
                         {
                             BewertungsID = 1,
                             BewertungsChar = "trifft voellig zu",
-                            BewertungsInt = 4,
+                            BewertungsInt = 0,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 2,
                             BewertungsChar = "trifft eher zu",
-                            BewertungsInt = 3,
+                            BewertungsInt = 0,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 3,
                             BewertungsChar = "trifft eher nicht zu",
-                            BewertungsInt = 2,
+                            BewertungsInt = 0,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 4,
                             BewertungsChar = "trifft ueberhaupt nicht zu",
-                            BewertungsInt = 1,
+                            BewertungsInt = 0,
                             BogenID = 1
                         },
                         new
@@ -356,9 +356,6 @@ namespace Feedback_Application.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("FeedbackID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("VarErgebnisID")
                         .HasColumnType("int");
 
                     b.HasKey("ErgebnisID");

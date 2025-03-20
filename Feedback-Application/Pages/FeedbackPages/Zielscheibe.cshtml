@@ -4,47 +4,63 @@
     ViewData["Title"] = "Feedbackbogen Zielscheibe";
 }
 
-<link rel="stylesheet" href="/css/feedback_styles.css">
+<link rel="stylesheet" href="/css/Zielscheibe.css">
 
 <div class="feedback-container">
-    <h3>Zielscheiben Feedback</h3>
-    <p>Bitte bewerten Sie die folgenden Aussagen, indem Sie ein Kreuz in der Zielscheibe setzen. Je näher zur Mitte, desto positiver die Bewertung.</p>
+    <h3>Zielscheibe</h3>
+    <p>
+        Bitte bewerten Sie die angegebenen Teilbereiche und setzen Sie innerhalb der einzelnen Segmente
+        an der nach Ihrer Meinung richtigen Stelle ein Kreuzchen. Je näher das Kreuzchen in der Mitte der
+        Zielscheibe gesetzt wird, desto positiver ist die Bewertung.
+    </p>
 
     <form method="post">
         <input type="hidden" asp-for="Code" />
 
         <div class="zielscheibe-wrapper">
             <div class="zielscheibe-container">
-                <img src="/images/zielscheibe.png" alt="Zielscheibe" class="zielscheibe-image">
-                @foreach (var aussage in Model.Aussagen)
-                {
-                    <div class="zielscheibe-label" style="position: absolute;">
-                        <span>@aussage.Aussage</span>
+                <div class="zielscheibe">
+                    @for (int ring = 1; ring <= 5; ring++)
+                    {
+                        <div class="ring ring-@ring"></div>
+                    }
+
+                    <!-- Exakt ausgerichtete Linien für die Segmentierung -->
+                    <div class="zielscheibe-linien">
+                        <div class="linie linie-vertikal"></div>
+                        <div class="linie linie-horizontal"></div>
+                        <div class="linie linie-diagonal1"></div>
+                        <div class="linie linie-diagonal2"></div>
                     </div>
-                }
+
+                    @foreach (var aussage in Model.Aussagen.Select((value, index) => new { Value = value, Index = index }))
+                    {
+                        <div class="label-box label-@aussage.Index">
+                            <span>@aussage.Value.Aussage</span>
+                        </div>
+                        @foreach (var bewertung in Model.Bewertungen.Where(b => b.BogenID == Model.FeedbackBogen.BogenID))
+                        {
+                            <input type="radio" name="bewertung_@aussage.Value.AussageID" value="@bewertung.BewertungsID" class="radio-button radio-@aussage.Index-@bewertung.BewertungsID" required />
+                        }
+                    }
+                </div>
             </div>
         </div>
 
-        <div class="bewertungsbereich">
-            @foreach (var aussage in Model.Aussagen)
-            {
-                <div class="bewertung-item">
-                    <label>@aussage.Aussage</label>
-                    <div class="bewertung-options">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <input type="radio" name="bewertung_@aussage.AussageID" value="@i" required />
-                            <label>@i</label>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-
-        <div class="extra-feedback">
-            <label>Was ich sonst noch anmerken möchte:</label>
-            <textarea name="extra_feedback"></textarea>
-        </div>
+        @if (Model.ExtraFeedbacks.Any())
+        {
+            <div class="extra-feedback">
+                <ul>
+                    @foreach (var extra in Model.ExtraFeedbacks)
+                    {
+                        <li>
+                            <label><b>@extra.Frage</b></label>
+                            <textarea name="extra_feedback_@extra.FragenID"></textarea>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
 
         <button type="submit" class="btn btn-primary">Absenden</button>
     </form>

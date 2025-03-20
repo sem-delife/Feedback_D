@@ -17,8 +17,8 @@ namespace Feedback_Application.Pages.Models
         [ForeignKey("Bewertung")]
         public int BewertungsID { get; set; } // Fremdschlüssel für Bewertungen
 
-        [ForeignKey("VariableErgebnisse")]
-        public int? VarErgebnisID { get; set; } // Fremdschlüssel für VariableErgebnisse (optional)
+        //[ForeignKey("VariableErgebnisse")]
+        //public int? VarErgebnisID { get; set; } // Fremdschlüssel für VariableErgebnisse (optional)
 
         [ForeignKey("Erstellung")]
         public int ErstellungsID { get; set; } // NEU: ID der spezifischen Feedback-Erstellung
