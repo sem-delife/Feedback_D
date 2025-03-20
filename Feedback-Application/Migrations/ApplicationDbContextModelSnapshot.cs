@@ -445,6 +445,18 @@ namespace Feedback_Application.Migrations
                             FragenID = 4,
                             BogenID = 2,
                             Frage = "Was ich sonst noch anmerken moechte: "
+                        },
+                        new
+                        {
+                            FragenID = 5,
+                            BogenID = 3,
+                            Frage = "Pro"
+                        },
+                        new
+                        {
+                            FragenID = 6,
+                            BogenID = 3,
+                            Frage = "Contra"
                         });
                 });
 
@@ -491,6 +503,11 @@ namespace Feedback_Application.Migrations
                         {
                             BogenID = 2,
                             Beschreibung = "Zielscheibe"
+                        },
+                        new
+                        {
+                            BogenID = 3,
+                            Beschreibung = "Smiley"
                         });
                 });
 
