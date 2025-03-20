@@ -59,7 +59,9 @@ namespace Feedback_Application
             // Feedbackbogen
             modelBuilder.Entity<Feedbackbogen>().HasData(
                 new Feedbackbogen { BogenID = 1, Beschreibung = "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I" },
-                new Feedbackbogen { BogenID = 2, Beschreibung = "Zielscheibe" }
+                new Feedbackbogen { BogenID = 2, Beschreibung = "Zielscheibe" },
+                new Feedbackbogen { BogenID = 3, Beschreibung = "Smiley" }
+
 
             );
 
@@ -113,10 +115,10 @@ namespace Feedback_Application
 
             // Bewertungen
             modelBuilder.Entity<Bewertungen>().HasData(
-                new Bewertungen { BewertungsID = 1, BogenID = 1, BewertungsChar = "trifft voellig zu", BewertungsInt = 4 },
-                new Bewertungen { BewertungsID = 2, BogenID = 1, BewertungsChar = "trifft eher zu", BewertungsInt = 3 },
-                new Bewertungen { BewertungsID = 3, BogenID = 1, BewertungsChar = "trifft eher nicht zu", BewertungsInt = 2 },
-                new Bewertungen { BewertungsID = 4, BogenID = 1, BewertungsChar = "trifft ueberhaupt nicht zu", BewertungsInt = 1 },
+                new Bewertungen { BewertungsID = 1, BogenID = 1, BewertungsChar = "trifft voellig zu", BewertungsInt = 0 },
+                new Bewertungen { BewertungsID = 2, BogenID = 1, BewertungsChar = "trifft eher zu", BewertungsInt = 0 },
+                new Bewertungen { BewertungsID = 3, BogenID = 1, BewertungsChar = "trifft eher nicht zu", BewertungsInt = 0 },
+                new Bewertungen { BewertungsID = 4, BogenID = 1, BewertungsChar = "trifft ueberhaupt nicht zu", BewertungsInt = 0 },
                 new Bewertungen { BewertungsID = 5, BogenID = 2, BewertungsChar = "", BewertungsInt = 1 },
                 new Bewertungen { BewertungsID = 6, BogenID = 2, BewertungsChar = "", BewertungsInt = 2 },
                 new Bewertungen { BewertungsID = 7, BogenID = 2, BewertungsChar = "", BewertungsInt = 3 },
@@ -129,7 +131,10 @@ namespace Feedback_Application
                 new ExtraFeedback { FragenID = 1, BogenID = 1, Frage = "Das hat mir besonders gut gefallen:" },
                 new ExtraFeedback { FragenID = 2, BogenID = 1, Frage = "Das hat mir nicht gefallen:" },
                 new ExtraFeedback { FragenID = 3, BogenID = 1, Frage = "Verbesserungsvorschlaege:" },
-                new ExtraFeedback { FragenID = 4, BogenID = 2, Frage = "Was ich sonst noch anmerken moechte: " }
+                new ExtraFeedback { FragenID = 4, BogenID = 2, Frage = "Was ich sonst noch anmerken moechte: " },
+                new ExtraFeedback { FragenID = 5, BogenID = 3, Frage = "Pro" },
+                new ExtraFeedback { FragenID = 6, BogenID = 3, Frage = "Contra" }
+
             );
 
             // Seeding für Registrierung (Lehrer-Code)
