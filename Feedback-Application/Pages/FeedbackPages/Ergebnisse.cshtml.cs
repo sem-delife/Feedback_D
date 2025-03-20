@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Feedback_Application.Pages.FeedbackPages
 {
     public class ErgebnisseModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private const int MindestFeedbacksFürAggregation = 5; // Mindestens 5 Feedbacks nötig für Aggregation
 
         public ErgebnisseModel(ApplicationDbContext context)
         {
@@ -19,8 +21,13 @@ namespace Feedback_Application.Pages.FeedbackPages
         }
 
         public List<FeedbackErgebnisViewModel> FeedbackErgebnisse { get; set; } = new();
+        public List<AggregierteErgebnisseViewModel> AggregierteErgebnisse { get; set; } = new();
 
-        public async Task<IActionResult> OnGetAsync()
+        public List<SelectListItem> KlassenList { get; set; } = new();
+        public List<SelectListItem> AbteilungList { get; set; } = new();
+        public List<SelectListItem> FachList { get; set; } = new();
+
+        public async Task<IActionResult> OnGetAsync(int? klassenId, int? abteilungsId, int? fachId)
         {
             var userGuid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             var isAdmin = User.IsInRole("Admin");
@@ -30,23 +37,35 @@ namespace Feedback_Application.Pages.FeedbackPages
                 return Forbid();
             }
 
-            Console.WriteLine($"Aktuelle Benutzer-GUID: {userGuid} (Admin: {isAdmin})");
+            // Listen für die Dropdowns befüllen
+            KlassenList = await _context.Klassen
+                .Select(k => new SelectListItem { Value = k.KlassenID.ToString(), Text = k.KlassenName })
+                .ToListAsync();
 
-            var userEntity = await _context.Users
-                .Where(u => u.Id == userGuid)
-                .Select(u => new { IntId = u.Id }) // Falls es eine andere Spalte gibt, hier anpassen
-                .FirstOrDefaultAsync();
+            AbteilungList = await _context.Abteilung
+                .Select(a => new SelectListItem { Value = a.AbteilungsID.ToString(), Text = a.AbteilungName })
+                .ToListAsync();
 
-            if (userEntity == null && !isAdmin)
+            FachList = await _context.Fach
+                .Select(f => new SelectListItem { Value = f.FachID.ToString(), Text = f.FachName })
+                .ToListAsync();
+
+            if (!isAdmin)
             {
-                return Forbid(); // Falls kein Benutzer gefunden wird und er kein Admin ist
+                FeedbackErgebnisse = await HoleEigeneFeedbacks(userGuid);
+            }
+            else
+            {
+                AggregierteErgebnisse = await HoleAggregierteErgebnisse(klassenId, abteilungsId, fachId);
             }
 
-            var userIntId = userEntity?.IntId; // Falls null, bleibt es null
+            return Page();
+        }
 
-            Console.WriteLine($"Gemappte User-IntID: {userIntId}");
 
-            var rawData = await (
+        private async Task<List<FeedbackErgebnisViewModel>> HoleEigeneFeedbacks(string userId)
+        {
+            return await (
                 from e in _context.Erstellung
                 join f in _context.Feedbackbogen on e.FeedbackID equals f.BogenID
                 join er in _context.Ergebnisse on e.ErstellungsID equals er.ErstellungsID into ergebnisseGroup
@@ -55,7 +74,7 @@ namespace Feedback_Application.Pages.FeedbackPages
                 from aussage in aussagenGroup.DefaultIfEmpty()
                 join b in _context.Bewertungen on ergebnis.BewertungsID equals b.BewertungsID into bewertungenGroup
                 from bewertung in bewertungenGroup.DefaultIfEmpty()
-                where isAdmin || e.UserID == userIntId 
+                where e.UserID == userId
                 select new
                 {
                     e.ErstellungsID,
@@ -64,16 +83,14 @@ namespace Feedback_Application.Pages.FeedbackPages
                     Aussage = aussage != null ? aussage.Aussage : null,
                     BewertungsChar = bewertung != null ? bewertung.BewertungsChar : null
                 }
-            ).ToListAsync();
-
-            Console.WriteLine($"Gefundene Umfragen: {rawData.Count}");
-
-            FeedbackErgebnisse = rawData
+            )
+            .ToListAsync()
+            .ContinueWith(task => task.Result
                 .GroupBy(x => new { x.ErstellungsID, x.FeedbackTitel, x.Erstellungsdatum })
                 .Select(g => new FeedbackErgebnisViewModel
                 {
                     ErstellungsID = g.Key.ErstellungsID,
-                    FeedbackTitel = g.Key.FeedbackTitel,
+                    FeedbackBeschreibung = g.Key.FeedbackTitel,
                     Erstellungsdatum = g.Key.Erstellungsdatum,
                     Ergebnisse = g
                         .Where(x => x.Aussage != null)
@@ -88,28 +105,46 @@ namespace Feedback_Application.Pages.FeedbackPages
                         })
                         .ToList()
                 })
-                .ToList();
-
-            return Page();
+                .ToList());
         }
 
+        private async Task<List<AggregierteErgebnisseViewModel>> HoleAggregierteErgebnisse(int? klassenId, int? abteilungsId, int? fachId)
+        {
+            var query = _context.Erstellung
+                .Include(e => e.Klassen)   // Korrekt: Navigationseigenschaft einbinden
+                .Include(e => e.Abteilung) // Korrekt: Navigationseigenschaft einbinden
+                .Include(e => e.Fach)      // Korrekt: Navigationseigenschaft einbinden
+                .AsQueryable();
 
+            if (klassenId.HasValue) query = query.Where(e => e.KlassenID == klassenId);
+            if (abteilungsId.HasValue) query = query.Where(e => e.AbteilungsID == abteilungsId);
+            if (fachId.HasValue) query = query.Where(e => e.FachID == fachId);
 
+            var gruppierteErgebnisse = await query
+                .GroupBy(e => new { e.Klassen.KlassenName, e.Abteilung.AbteilungName, e.Fach.FachName }) // Namen statt IDs verwenden
+                .Where(g => g.Count() >= MindestFeedbacksFürAggregation) // Mindestanzahl prüfen
+                .Select(g => new AggregierteErgebnisseViewModel
+                {
+                    KlassenID = g.First().KlassenID,
+                    AbteilungsID = g.First().AbteilungsID,
+                    FachID = g.First().FachID,
+                    AnzahlFeedbacks = g.Count(),
+                    Titel = $"{g.Key.AbteilungName} - {g.Key.KlassenName} - {g.Key.FachName}", // Menschlich lesbarer Titel
+                    Ergebnisse = g.SelectMany(e => _context.Ergebnisse
+                        .Where(er => er.ErstellungsID == e.ErstellungsID)
+                        .GroupBy(er => er.AussageID)
+                        .Select(aussageGrp => new AggregierteAussageErgebnis
+                        {
+                            Aussage = _context.Aussagen.FirstOrDefault(a => a.AussageID == aussageGrp.Key).Aussage,
+                            Durchschnittswert = aussageGrp.Average(er => er.BewertungsID),
+                            AnzahlAntworten = aussageGrp.Count()
+                        })
+                    ).ToList()
+                })
+                .ToListAsync();
 
+            return gruppierteErgebnisse;
+        }
 
-    }
-
-    public class FeedbackErgebnisViewModel
-    {
-        public int ErstellungsID { get; set; }
-        public string FeedbackTitel { get; set; }
-        public DateTime Erstellungsdatum { get; set; }
-        public List<FeedbackAussageErgebnis> Ergebnisse { get; set; } = new();
-    }
-
-    public class FeedbackAussageErgebnis
-    {
-        public string Aussage { get; set; }
-        public Dictionary<string, int> Antwortverteilung { get; set; } = new();
     }
 }

@@ -4,27 +4,111 @@
     ViewData["Title"] = "Ergebnisse";
 }
 
-<link rel="stylesheet" href="~/css/Ergebnisse.css" />
+<h2>Feedback-Ergebnisse</h2>
 
-<div class="feedback-container">
-    <h2>Feedback-Ergebnisse</h2>
+@if (User.IsInRole("Admin"))
+{
+    <!-- Admin Filterbereich -->
+    <div class="admin-filter p-3 mb-4 bg-light border rounded">
+        <h5>Filteroptionen für Admins</h5>
+        <form method="get">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="KlassenFilter" class="form-label">Klasse:</label>
+                    <select id="KlassenFilter" name="klassenId" class="form-select">
+                        <option value="">Alle Klassen</option>
+                        @foreach (var klasse in Model.KlassenList)
+                        {
+                            <option value="@klasse.Value">@klasse.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="AbteilungFilter" class="form-label">Abteilung:</label>
+                    <select id="AbteilungFilter" name="abteilungsId" class="form-select">
+                        <option value="">Alle Abteilungen</option>
+                        @foreach (var abteilung in Model.AbteilungList)
+                        {
+                            <option value="@abteilung.Value">@abteilung.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="FachFilter" class="form-label">Fach:</label>
+                    <select id="FachFilter" name="fachId" class="form-select">
+                        <option value="">Alle Fächer</option>
+                        @foreach (var fach in Model.FachList)
+                        {
+                            <option value="@fach.Value">@fach.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Filter anwenden</button>
+        </form>
+    </div>
 
+    <!-- Aggregierte Ergebnisse -->
+    <div class="accordion" id="aggregierteErgebnisseAccordion">
+        @if (Model.AggregierteErgebnisse.Any())
+        {
+            @foreach (var ergebnis in Model.AggregierteErgebnisse)
+            {
+                var id = $"aggregiert-{ergebnis.KlassenID}-{ergebnis.AbteilungsID}-{ergebnis.FachID}";
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-@id">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@id">
+                            @ergebnis.Titel (Feedbacks: @ergebnis.AnzahlFeedbacks)
+                        </button>
+                    </h2>
+                    <div id="collapse-@id" class="accordion-collapse collapse" data-bs-parent="#aggregierteErgebnisseAccordion">
+                        <div class="accordion-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Aussage</th>
+                                        <th>Durchschnittswert</th>
+                                        <th>Anzahl Antworten</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var aussage in ergebnis.Ergebnisse)
+                                    {
+                                        <tr>
+                                            <td>@aussage.Aussage</td>
+                                            <td>@aussage.Durchschnittswert.ToString("0.00")</td>
+                                            <td>@aussage.AnzahlAntworten</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Keine aggregierten Ergebnisse verfügbar.</p>
+        }
+    </div>
+}
+else
+{
+    <!-- Normale Nutzer sehen ihre eigenen Feedback-Ergebnisse -->
     <div class="accordion" id="feedbackAccordion">
         @if (Model.FeedbackErgebnisse.Any())
         {
             @foreach (var feedback in Model.FeedbackErgebnisse.OrderByDescending(f => f.Erstellungsdatum))
             {
                 var feedbackId = $"feedback-{feedback.ErstellungsID}";
-
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading-@feedbackId">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapse-@feedbackId" aria-expanded="false" aria-controls="collapse-@feedbackId">
-                            @feedback.FeedbackTitel (Erstellt am: @feedback.Erstellungsdatum.ToShortDateString())
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@feedbackId">
+                            @feedback.FeedbackBeschreibung (Erstellt am: @feedback.Erstellungsdatum.ToShortDateString())
                         </button>
                     </h2>
-                    <div id="collapse-@feedbackId" class="accordion-collapse collapse" aria-labelledby="heading-@feedbackId"
-                         data-bs-parent="#feedbackAccordion">
+                    <div id="collapse-@feedbackId" class="accordion-collapse collapse" data-bs-parent="#feedbackAccordion">
                         <div class="accordion-body">
                             <table class="table table-striped">
                                 <thead>
@@ -65,4 +149,4 @@
             <p class="text-center text-muted">Es sind noch keine Feedback-Ergebnisse vorhanden.</p>
         }
     </div>
-</div>
+}
