@@ -20,3 +20,120 @@ html {
 body {
   height: 100svh;
 }
+
+/* Dark Mode */
+.dark-mode {
+    background-color: #222;
+    color: #727375;
+}
+
+    /* Optional: Buttons und andere Elemente anpassen */
+    .dark-mode .btn {
+        background-color: #333;
+        color: #727375;
+    }
+
+    .dark-mode .card {
+        background-color: #212529;
+        color: #727375;
+    }
+
+    .dark-mode .table {
+        background-color: #212529;
+        color: #727375;
+    }
+
+    .dark-mode .bg-white {
+        background-color: #212529 !important;
+        color: #727375;
+    }
+
+        .dark-mode .bg-white::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%230c63e4'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e")
+        }
+
+    .dark-mode .navbar-brand {
+        color: #727375;
+    }
+
+    .dark-mode .text-dark {
+        color: #727375 !important;
+    }
+
+    .dark-mode .form-label {
+        color: black;
+    }
+
+    .dark-mode .bg-light {
+        background-color: #212529 !important;
+    }
+
+    .dark-mode input {
+        background-color: #7273756b;
+        color: #727375;
+    }
+
+        .dark-mode input:focus {
+            background-color: #7273756b;
+            color: #727375;
+        }
+
+    .dark-mode .form-control {
+        background-color: #7273756b;
+        color: #727375;
+    }
+
+    .dark-mode .accordion-item {
+        background-color: #212529;
+    }
+
+    .dark-mode td {
+        color: #727375;
+    }
+
+    .dark-mode .force-dark {
+        color:black !important;
+    }
+
+    .dark-mode .force-dark::placeholder {
+        color: black !important;
+    }
+
+    .dark-mode textarea {
+        background-color: #727375;
+    }
+
+    .dark-mode textarea::placeholder {
+        color: black;
+    }
+
+    .dark-mode .label-box {
+        background-color: #727375;
+        color: black;
+    }
+
+    .dark-mode .ring {
+        background-color: #7273756b;
+        border: 2px solid white;
+    }
+
+    .dark-mode .zielscheibe {
+        border: 2px solid white;
+    }
+
+    .dark-mode .feedback-1 {
+        background-color: #454547;
+    }
+    .dark-mode .feedback-1-inner {
+        background-color: #5c5c5f;
+    }
+    .dark-mode .checkbox-dark {
+        background-color: #5c5c5f;
+        border-color: black;
+        color: black;
+    }
+    .dark-mode .checkbox-darkblue {
+        background-color: #26405d;
+        border-color: black;
+        color: black;
+    }

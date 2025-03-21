@@ -8,9 +8,14 @@
     <link rel="stylesheet" href="~/css/Homepage.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
 <div>
-    <div class="text-center">
+    <div class="text-center mb-5 text-dark">
         <h1>Feedback-Verwaltung</h1>
         <h2>Berufsschule Lichtenfels</h2>
     </div>
@@ -35,13 +40,13 @@
         <div class="container-Start">
             <a href="Identity/Account/Login" class="card login">
                 <div class="icon">🔒</div>
-                Login
+                Anmelden
             </a>
             <a class="card code_eingabe">
                 <form method="post" asp-page-handler="SubmitCode">
                     <div class="icon">⌨️</div>
                     Code eingeben
-                    <input type="text" id="codeInput" name="CodeDB" required class="form-control mt-2" placeholder="Geben Sie den Code ein"/>
+                    <input type="text" id="codeInput" name="CodeDB" required class="form-control mt-2 force-dark" placeholder="Geben Sie den Code ein"/>
                 </form>
             </a>
         </div>
@@ -49,13 +54,6 @@
 </div>
 <form method="post" asp-page-handler="SubmitFeedback">
     @Html.AntiForgeryToken()
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
-    }
 
     <input type="hidden" asp-for="SelectedForm" id="SelectedFormHidden" />
     <input type="hidden" asp-for="SelectedClass" id="selectedClass" />
@@ -74,7 +72,7 @@
 <!-- Multi-Step Modal -->
 <div class="modal fade" id="multiStepModal" tabindex="-1" aria-labelledby="Feedback-Bogen erstellen" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content bg-white">
             <div class="modal-header">
                 <h5 class="modal-title" id="multiStepModalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -155,7 +153,7 @@
 
                 <div id="step3" class="modal-step d-none">
                     <h4>Geben sie diesen Code an ihre Klasse weiter</h4>
-                    <p id="generatedCode" class="fs-4 fw-bold text-center"></p>
+                    <p id="generatedCode" class="fs-4 fw-bold text-center mt-4 text-dark"></p>
                 </div>
             </div>
             <div class="modal-footer">
