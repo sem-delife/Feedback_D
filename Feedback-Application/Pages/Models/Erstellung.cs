@@ -40,6 +40,8 @@ namespace Feedback_Application.Pages.Models
         public virtual Klassen Klassen { get; set; }
         public virtual Abteilung Abteilung { get; set; }
         public virtual Fach Fach { get; set; }
+        public virtual Feedbackbogen Feedbackbogen { get; set; }
+
 
 
         // Konstruktor (optional)

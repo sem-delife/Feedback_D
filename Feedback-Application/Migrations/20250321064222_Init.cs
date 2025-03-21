@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Feedback_Application.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -120,47 +120,6 @@ namespace Feedback_Application.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Ergebnisse",
-                columns: table => new
-                {
-                    ErgebnisID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FeedbackID = table.Column<int>(type: "int", nullable: false),
-                    AussageID = table.Column<int>(type: "int", nullable: false),
-                    BewertungsID = table.Column<int>(type: "int", nullable: false),
-                    ErstellungsID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ergebnisse", x => x.ErgebnisID);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Erstellung",
-                columns: table => new
-                {
-                    ErstellungsID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FeedbackID = table.Column<int>(type: "int", nullable: false),
-                    UserID = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    KlassenID = table.Column<int>(type: "int", nullable: false),
-                    AbteilungsID = table.Column<int>(type: "int", nullable: false),
-                    FachID = table.Column<int>(type: "int", nullable: false),
-                    Code = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Jahrgang = table.Column<int>(type: "int", nullable: true),
-                    Schuljahr = table.Column<int>(type: "int", nullable: false),
-                    Erstellungsdatum = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Erstellung", x => x.ErstellungsID);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "ExtraFeedback",
                 columns: table => new
                 {
@@ -249,23 +208,6 @@ namespace Feedback_Application.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Registrierung", x => x.RegID);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Variable_Ergebnisse",
-                columns: table => new
-                {
-                    VarErgebnisID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FragenID = table.Column<int>(type: "int", nullable: false),
-                    ErstellungsID = table.Column<int>(type: "int", nullable: false),
-                    AntwortUser = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Variable_Ergebnisse", x => x.VarErgebnisID);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -396,6 +338,112 @@ namespace Feedback_Application.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "Ergebnisse",
+                columns: table => new
+                {
+                    ErgebnisID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ErstellungsID = table.Column<int>(type: "int", nullable: false),
+                    FeedbackID = table.Column<int>(type: "int", nullable: false),
+                    AussageID = table.Column<int>(type: "int", nullable: false),
+                    BewertungsID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ergebnisse", x => x.ErgebnisID);
+                    table.ForeignKey(
+                        name: "FK_Ergebnisse_Aussagen_AussageID",
+                        column: x => x.AussageID,
+                        principalTable: "Aussagen",
+                        principalColumn: "AussageID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Ergebnisse_Bewertungen_BewertungsID",
+                        column: x => x.BewertungsID,
+                        principalTable: "Bewertungen",
+                        principalColumn: "BewertungsID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Erstellung",
+                columns: table => new
+                {
+                    ErstellungsID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FeedbackID = table.Column<int>(type: "int", nullable: false),
+                    UserID = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    KlassenID = table.Column<int>(type: "int", nullable: false),
+                    AbteilungsID = table.Column<int>(type: "int", nullable: false),
+                    FachID = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Jahrgang = table.Column<int>(type: "int", nullable: true),
+                    Schuljahr = table.Column<int>(type: "int", nullable: false),
+                    Erstellungsdatum = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Erstellung", x => x.ErstellungsID);
+                    table.ForeignKey(
+                        name: "FK_Erstellung_Abteilung_AbteilungsID",
+                        column: x => x.AbteilungsID,
+                        principalTable: "Abteilung",
+                        principalColumn: "AbteilungsID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Erstellung_Fach_FachID",
+                        column: x => x.FachID,
+                        principalTable: "Fach",
+                        principalColumn: "FachID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Erstellung_Feedbackbogen_FeedbackID",
+                        column: x => x.FeedbackID,
+                        principalTable: "Feedbackbogen",
+                        principalColumn: "BogenID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Erstellung_Klassen_KlassenID",
+                        column: x => x.KlassenID,
+                        principalTable: "Klassen",
+                        principalColumn: "KlassenID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Variable_Ergebnisse",
+                columns: table => new
+                {
+                    VarErgebnisID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FragenID = table.Column<int>(type: "int", nullable: false),
+                    ErstellungsID = table.Column<int>(type: "int", nullable: false),
+                    AntwortUser = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Variable_Ergebnisse", x => x.VarErgebnisID);
+                    table.ForeignKey(
+                        name: "FK_Variable_Ergebnisse_Erstellung_ErstellungsID",
+                        column: x => x.ErstellungsID,
+                        principalTable: "Erstellung",
+                        principalColumn: "ErstellungsID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Variable_Ergebnisse_ExtraFeedback_FragenID",
+                        column: x => x.FragenID,
+                        principalTable: "ExtraFeedback",
+                        principalColumn: "FragenID",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "Aussagen",
                 columns: new[] { "AussageID", "Aussage", "ThemaID" },
@@ -439,10 +487,10 @@ namespace Feedback_Application.Migrations
                 columns: new[] { "BewertungsID", "BewertungsChar", "BewertungsInt", "BogenID" },
                 values: new object[,]
                 {
-                    { 1, "trifft voellig zu", 0, 1 },
-                    { 2, "trifft eher zu", 0, 1 },
-                    { 3, "trifft eher nicht zu", 0, 1 },
-                    { 4, "trifft ueberhaupt nicht zu", 0, 1 },
+                    { 1, "trifft voellig zu", 1, 1 },
+                    { 2, "trifft eher zu", 2, 1 },
+                    { 3, "trifft eher nicht zu", 3, 1 },
+                    { 4, "trifft ueberhaupt nicht zu", 4, 1 },
                     { 5, "", 1, 2 },
                     { 6, "", 2, 2 },
                     { 7, "", 3, 2 },
@@ -468,7 +516,7 @@ namespace Feedback_Application.Migrations
                 columns: new[] { "BogenID", "Beschreibung" },
                 values: new object[,]
                 {
-                    { 1, "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I" },
+                    { 1, "Klassisch" },
                     { 2, "Zielscheibe" },
                     { 3, "Smiley" }
                 });
@@ -526,14 +574,51 @@ namespace Feedback_Application.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ergebnisse_AussageID",
+                table: "Ergebnisse",
+                column: "AussageID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ergebnisse_BewertungsID",
+                table: "Ergebnisse",
+                column: "BewertungsID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Erstellung_AbteilungsID",
+                table: "Erstellung",
+                column: "AbteilungsID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Erstellung_FachID",
+                table: "Erstellung",
+                column: "FachID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Erstellung_FeedbackID",
+                table: "Erstellung",
+                column: "FeedbackID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Erstellung_KlassenID",
+                table: "Erstellung",
+                column: "KlassenID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variable_Ergebnisse_ErstellungsID",
+                table: "Variable_Ergebnisse",
+                column: "ErstellungsID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Variable_Ergebnisse_FragenID",
+                table: "Variable_Ergebnisse",
+                column: "FragenID");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Abteilung");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -550,28 +635,7 @@ namespace Feedback_Application.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Aussagen");
-
-            migrationBuilder.DropTable(
-                name: "Bewertungen");
-
-            migrationBuilder.DropTable(
                 name: "Ergebnisse");
-
-            migrationBuilder.DropTable(
-                name: "Erstellung");
-
-            migrationBuilder.DropTable(
-                name: "ExtraFeedback");
-
-            migrationBuilder.DropTable(
-                name: "Fach");
-
-            migrationBuilder.DropTable(
-                name: "Feedbackbogen");
-
-            migrationBuilder.DropTable(
-                name: "Klassen");
 
             migrationBuilder.DropTable(
                 name: "Oberthema");
@@ -587,6 +651,30 @@ namespace Feedback_Application.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Aussagen");
+
+            migrationBuilder.DropTable(
+                name: "Bewertungen");
+
+            migrationBuilder.DropTable(
+                name: "Erstellung");
+
+            migrationBuilder.DropTable(
+                name: "ExtraFeedback");
+
+            migrationBuilder.DropTable(
+                name: "Abteilung");
+
+            migrationBuilder.DropTable(
+                name: "Fach");
+
+            migrationBuilder.DropTable(
+                name: "Feedbackbogen");
+
+            migrationBuilder.DropTable(
+                name: "Klassen");
         }
     }
 }

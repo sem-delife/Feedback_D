@@ -11,6 +11,7 @@ namespace Feedback_Application.Pages.Models
         public string AggregationsTyp { get; set; } // "Klasse", "Abteilung" oder "Fach"
         public string Titel { get; set; } // Z. B. "Klasse IT12 - Schuljahr 2024"
         public int AnzahlFeedbacks { get; set; }
+        public int FeedbackTeilnehmer { get; set; } = 0;
         public List<AggregierteAussageErgebnis> Ergebnisse { get; set; } = new();
     }
 
