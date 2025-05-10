@@ -6,8 +6,8 @@
 
 <link rel="stylesheet" href="/css/feedback_styles.css">
 
-<div class="feedback-container">
-    <h3>Unterrichtsbeurteilung durch Schülerinnen und Schüler</h3>
+<div class="feedback-container feedback-1">
+    <h3 class="text-dark">Unterrichtsbeurteilung durch Schülerinnen und Schüler</h3>
 
     <form method="post">
         <input type="hidden" asp-for="Code" />
@@ -16,16 +16,16 @@
         {
             @foreach (var thema in Model.Oberthemen)
             {
-                <div class="theme-box">
+                <div class="theme-box feedback-1-inner">
                     <h3>@thema.Thema</h3>
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Aussage</th>
+                                    <th class="checkbox-darkblue">Aussage</th>
                                     @foreach (var bewertung in Model.Bewertungen.DistinctBy(b => b.BewertungsChar))
                                     {
-                                        <th>@bewertung.BewertungsChar</th>
+                                        <th class="checkbox-darkblue">@bewertung.BewertungsChar</th>
                                     }
                                 </tr>
                             </thead>
@@ -33,10 +33,10 @@
                                 @foreach (var aussage in Model.Aussagen.Where(a => a.ThemaID == thema.ThemaID))
                                 {
                                     <tr>
-                                        <td>@aussage.Aussage</td>
+                                        <td class="checkbox-dark">@aussage.Aussage</td>
                                         @foreach (var bewertung in Model.Bewertungen.DistinctBy(b => b.BewertungsChar))
                                         {
-                                            <td class="checkbox-container">
+                                            <td class="checkbox-container checkbox-dark">
                                                 <input type="radio" name="bewertung_@aussage.AussageID"
                                                        value="@bewertung.BewertungsID" required />
                                             </td>
@@ -51,7 +51,7 @@
 
             @if (Model.ExtraFeedbacks.Any())
             {
-                <div class="theme-box">
+                <div class="theme-box bg-white">
                     <h3>Zusätzliches Feedback</h3>
                     <ul>
                         @foreach (var extra in Model.ExtraFeedbacks)

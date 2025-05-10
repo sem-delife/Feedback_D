@@ -4,65 +4,156 @@
     ViewData["Title"] = "Ergebnisse";
 }
 
-<link rel="stylesheet" href="~/css/Ergebnisse.css" />
+<h2>Feedback-Ergebnisse</h2>
 
-<div class="feedback-container">
-    <h2>Feedback-Ergebnisse</h2>
-
-    <div class="accordion" id="feedbackAccordion">
-        @if (Model.FeedbackErgebnisse.Any())
+<div class="accordion" id="feedbackAccordion">
+    @if (Model.FeedbackErgebnisse.Any())
+    {
+        @foreach (var feedback in Model.FeedbackErgebnisse.OrderByDescending(f => f.Erstellungsdatum))
         {
-            @foreach (var feedback in Model.FeedbackErgebnisse.OrderByDescending(f => f.Erstellungsdatum))
-            {
-                var feedbackId = $"feedback-{feedback.ErstellungsID}";
+            var feedbackId = $"feedback-{feedback.ErstellungsID}";
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading-@feedbackId">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapse-@feedbackId" aria-expanded="false" aria-controls="collapse-@feedbackId">
-                            @feedback.FeedbackTitel (Erstellt am: @feedback.Erstellungsdatum.ToShortDateString())
-                        </button>
-                    </h2>
-                    <div id="collapse-@feedbackId" class="accordion-collapse collapse" aria-labelledby="heading-@feedbackId"
-                         data-bs-parent="#feedbackAccordion">
-                        <div class="accordion-body">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-@feedbackId">
+                    <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapse-@feedbackId">
+                        <strong>@feedback.FeedbackTitel</strong>
+                        | @feedback.FeedbackBeschreibung
+                        | Teilnehmer: @feedback.FeedbackTeilnehmer
+                    </button>
+                </h2>
+                <div id="collapse-@feedbackId" class="accordion-collapse collapse" data-bs-parent="#feedbackAccordion">
+                    <div class="accordion-body">
+
+                        <!-- Normale Antworten -->
+                        @if (feedback.Ergebnisse.Any())
+                        {
+                            <div class="d-flex">
+                            <h4>Normale Antworten</h4>
+                            @if (feedback.FeedbackID == 1){
+                                    <small class="ms-auto text-muted">1="trifft voellig zu"  2="trifft eher zu"  3="trifft eher nicht zu"  4="trifft ueberhaupt nicht zu"</small>
+                            } else {
+                                    <small class="ms-auto text-muted">1 = trifft völlig zu  2 = trifft eher zu  3 = teils/teils  4 = trifft eher nicht zu  5 = trifft überhaupt nicht zu</small>
+
+                            }
+                            </div>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>Aussage</th>
-                                        <th colspan="4">Antworten</th>
+                                        <th>Durchschnitt</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (feedback.Ergebnisse.Any())
+                                    @foreach (var ergebnis in feedback.Ergebnisse)
                                     {
-                                        @foreach (var ergebnis in feedback.Ergebnisse)
+                                        <tr>
+                                            <td>@ergebnis.Aussage</td>
+                                            <td>@ergebnis.Durchschnittswert.ToString("0.00")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            @if (feedback.FeedbackID == 1 || feedback.FeedbackID == 2)
+                            {
+                                <p class="text-center text-muted">Keine Antworten für diesen Feedbackbogen vorhanden.</p>
+                            }
+                        }
+
+                        <!-- Variable Antworten -->
+                        @if (feedback.FeedbackID == 1 || feedback.FeedbackID == 2 || feedback.FeedbackID == 3)
+                        {
+                            <h4>Variable Antworten</h4>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        @if (feedback.FeedbackID == 1)
+                                        {
+                                            @foreach (var frage in feedback.VariableErgebnisse.Select(v => v.Frage).Distinct())
+                                            {
+                                                <th>@frage</th>
+                                            }
+                                        }
+                                        else if (feedback.FeedbackID == 2)
+                                        {
+                                            @foreach (var frage in feedback.VariableErgebnisse.Select(v => v.Frage).Distinct())
+                                            {
+                                                <th>@frage</th>
+                                            }
+                                        }
+                                        else if (feedback.FeedbackID == 3)
+                                        {
+                                            <th>Pro</th>
+                                            <th>Contra</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (feedback.FeedbackID == 1)
+                                    {
+                                        <tr>
+                                            @foreach (var frage in feedback.VariableErgebnisse.Select(v => v.Frage).Distinct())
+                                            {
+                                                var antworten = feedback.VariableErgebnisse
+                                                .Where(v => v.Frage == frage)
+                                                .Select(v => v.Antwort)
+                                                .ToList();
+
+                                                <td>
+                                                    @foreach (var antwort in antworten)
+                                                    {
+                                                        <div>@antwort</div>
+                                                        <hr>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                    else if (feedback.FeedbackID == 3)
+                                    {
+                                        var proAntworten = feedback.VariableErgebnisse
+                                        .Where(v => v.Frage == "Pro")
+                                        .Select(v => v.Antwort)
+                                        .ToList();
+
+                                        var contraAntworten = feedback.VariableErgebnisse
+                                        .Where(v => v.Frage == "Contra")
+                                        .Select(v => v.Antwort)
+                                        .ToList();
+
+                                        var maxZeilen = Math.Max(proAntworten.Count, contraAntworten.Count);
+
+                                        for (int i = 0; i < maxZeilen; i++)
                                         {
                                             <tr>
-                                                <td>@ergebnis.Aussage</td>
-                                                @foreach (var antwort in ergebnis.Antwortverteilung)
-                                                {
-                                                    <td>@antwort.Key: @antwort.Value</td>
-                                                }
+                                                <td>@(i < proAntworten.Count ? proAntworten[i] : "")</td>
+                                                <td>@(i < contraAntworten.Count ? contraAntworten[i] : "")</td>
                                             </tr>
                                         }
                                     }
                                     else
                                     {
-                                        <tr>
-                                            <td colspan="5" class="text-center">Keine Antworten für diesen Feedbackbogen vorhanden.</td>
-                                        </tr>
+                                        @foreach (var variable in feedback.VariableErgebnisse)
+                                        {
+                                            <tr>
+                                                <td>@variable.Antwort</td>
+                                            </tr>
+                                        }
                                     }
                                 </tbody>
                             </table>
-                        </div>
+                        }
+
                     </div>
                 </div>
-            }
+            </div>
         }
-        else
-        {
-            <p class="text-center text-muted">Es sind noch keine Feedback-Ergebnisse vorhanden.</p>
-        }
-    </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">Es sind noch keine Feedback-Ergebnisse vorhanden.</p>
+    }
 </div>

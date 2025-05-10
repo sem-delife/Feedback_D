@@ -6,21 +6,21 @@ namespace Feedback_Application.Pages.Models
     public class Ergebnisse
     {
         [Key]
-        public int ErgebnisID { get; set; } // Primärschlüssel
+        public int ErgebnisID { get; set; }
 
         [ForeignKey("Erstellung")]
-        public int FeedbackID { get; set; } // Fremdschlüssel für Feedback (Erstellung)
+        public int ErstellungsID { get; set; }
+
+        [ForeignKey("Feedbackbogen")]
+        public int FeedbackID { get; set; }
 
         [ForeignKey("Aussagen")]
-        public int AussageID { get; set; } // Fremdschlüssel für Aussagen
+        public int AussageID { get; set; }
+        public virtual Aussagen Aussage { get; set; }
 
         [ForeignKey("Bewertung")]
-        public int BewertungsID { get; set; } // Fremdschlüssel für Bewertungen
-
-        //[ForeignKey("VariableErgebnisse")]
-        //public int? VarErgebnisID { get; set; } // Fremdschlüssel für VariableErgebnisse (optional)
-
-        [ForeignKey("Erstellung")]
-        public int ErstellungsID { get; set; } // NEU: ID der spezifischen Feedback-Erstellung
+        public int BewertungsID { get; set; }
+        public virtual Bewertungen Bewertung { get; set; }
     }
+
 }

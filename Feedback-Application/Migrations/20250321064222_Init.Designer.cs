@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Feedback_Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250320091221_init")]
-    partial class init
+    [Migration("20250321064222_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,28 +277,28 @@ namespace Feedback_Application.Migrations
                         {
                             BewertungsID = 1,
                             BewertungsChar = "trifft voellig zu",
-                            BewertungsInt = 0,
+                            BewertungsInt = 1,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 2,
                             BewertungsChar = "trifft eher zu",
-                            BewertungsInt = 0,
+                            BewertungsInt = 2,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 3,
                             BewertungsChar = "trifft eher nicht zu",
-                            BewertungsInt = 0,
+                            BewertungsInt = 3,
                             BogenID = 1
                         },
                         new
                         {
                             BewertungsID = 4,
                             BewertungsChar = "trifft ueberhaupt nicht zu",
-                            BewertungsInt = 0,
+                            BewertungsInt = 4,
                             BogenID = 1
                         },
                         new
@@ -360,6 +360,10 @@ namespace Feedback_Application.Migrations
 
                     b.HasKey("ErgebnisID");
 
+                    b.HasIndex("AussageID");
+
+                    b.HasIndex("BewertungsID");
+
                     b.ToTable("Ergebnisse");
                 });
 
@@ -401,6 +405,14 @@ namespace Feedback_Application.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("ErstellungsID");
+
+                    b.HasIndex("AbteilungsID");
+
+                    b.HasIndex("FachID");
+
+                    b.HasIndex("FeedbackID");
+
+                    b.HasIndex("KlassenID");
 
                     b.ToTable("Erstellung");
                 });
@@ -500,7 +512,7 @@ namespace Feedback_Application.Migrations
                         new
                         {
                             BogenID = 1,
-                            Beschreibung = "Unterrichtsbeurteilung durch Schuelerinnen und Schueler I"
+                            Beschreibung = "Klassisch"
                         },
                         new
                         {
@@ -626,6 +638,10 @@ namespace Feedback_Application.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("VarErgebnisID");
+
+                    b.HasIndex("ErstellungsID");
+
+                    b.HasIndex("FragenID");
 
                     b.ToTable("Variable_Ergebnisse");
                 });
@@ -824,6 +840,79 @@ namespace Feedback_Application.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Feedback_Application.Pages.Models.Ergebnisse", b =>
+                {
+                    b.HasOne("Feedback_Application.Pages.Models.Aussagen", "Aussage")
+                        .WithMany()
+                        .HasForeignKey("AussageID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feedback_Application.Pages.Models.Bewertungen", "Bewertung")
+                        .WithMany()
+                        .HasForeignKey("BewertungsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Aussage");
+
+                    b.Navigation("Bewertung");
+                });
+
+            modelBuilder.Entity("Feedback_Application.Pages.Models.Erstellung", b =>
+                {
+                    b.HasOne("Feedback_Application.Pages.Models.Abteilung", "Abteilung")
+                        .WithMany()
+                        .HasForeignKey("AbteilungsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feedback_Application.Pages.Models.Fach", "Fach")
+                        .WithMany()
+                        .HasForeignKey("FachID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feedback_Application.Pages.Models.Feedbackbogen", "Feedbackbogen")
+                        .WithMany()
+                        .HasForeignKey("FeedbackID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feedback_Application.Pages.Models.Klassen", "Klassen")
+                        .WithMany()
+                        .HasForeignKey("KlassenID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Abteilung");
+
+                    b.Navigation("Fach");
+
+                    b.Navigation("Feedbackbogen");
+
+                    b.Navigation("Klassen");
+                });
+
+            modelBuilder.Entity("Feedback_Application.Pages.Models.Variable_Ergebnisse", b =>
+                {
+                    b.HasOne("Feedback_Application.Pages.Models.Erstellung", "Erstellung")
+                        .WithMany()
+                        .HasForeignKey("ErstellungsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Feedback_Application.Pages.Models.ExtraFeedback", "ExtraFeedback")
+                        .WithMany()
+                        .HasForeignKey("FragenID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Erstellung");
+
+                    b.Navigation("ExtraFeedback");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

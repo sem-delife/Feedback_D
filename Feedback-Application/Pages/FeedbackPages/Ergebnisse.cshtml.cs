@@ -23,93 +23,69 @@ namespace Feedback_Application.Pages.FeedbackPages
         public async Task<IActionResult> OnGetAsync()
         {
             var userGuid = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var isAdmin = User.IsInRole("Admin");
 
             if (string.IsNullOrEmpty(userGuid))
             {
                 return Forbid();
             }
 
-            Console.WriteLine($"Aktuelle Benutzer-GUID: {userGuid} (Admin: {isAdmin})");
-
-            var userEntity = await _context.Users
-                .Where(u => u.Id == userGuid)
-                .Select(u => new { IntId = u.Id }) // Falls es eine andere Spalte gibt, hier anpassen
-                .FirstOrDefaultAsync();
-
-            if (userEntity == null && !isAdmin)
-            {
-                return Forbid(); // Falls kein Benutzer gefunden wird und er kein Admin ist
-            }
-
-            var userIntId = userEntity?.IntId; // Falls null, bleibt es null
-
-            Console.WriteLine($"Gemappte User-IntID: {userIntId}");
-
-            var rawData = await (
-                from e in _context.Erstellung
-                join f in _context.Feedbackbogen on e.FeedbackID equals f.BogenID
-                join er in _context.Ergebnisse on e.ErstellungsID equals er.ErstellungsID into ergebnisseGroup
-                from ergebnis in ergebnisseGroup.DefaultIfEmpty()
-                join a in _context.Aussagen on ergebnis.AussageID equals a.AussageID into aussagenGroup
-                from aussage in aussagenGroup.DefaultIfEmpty()
-                join b in _context.Bewertungen on ergebnis.BewertungsID equals b.BewertungsID into bewertungenGroup
-                from bewertung in bewertungenGroup.DefaultIfEmpty()
-                where isAdmin || e.UserID == userIntId 
-                select new
-                {
-                    e.ErstellungsID,
-                    e.Erstellungsdatum,
-                    FeedbackTitel = f.Beschreibung,
-                    Aussage = aussage != null ? aussage.Aussage : null,
-                    BewertungsChar = bewertung != null ? bewertung.BewertungsChar : null
-                }
-            ).ToListAsync();
-
-            Console.WriteLine($"Gefundene Umfragen: {rawData.Count}");
-
-            FeedbackErgebnisse = rawData
-                .GroupBy(x => new { x.ErstellungsID, x.FeedbackTitel, x.Erstellungsdatum })
-                .Select(g => new FeedbackErgebnisViewModel
-                {
-                    ErstellungsID = g.Key.ErstellungsID,
-                    FeedbackTitel = g.Key.FeedbackTitel,
-                    Erstellungsdatum = g.Key.Erstellungsdatum,
-                    Ergebnisse = g
-                        .Where(x => x.Aussage != null)
-                        .GroupBy(x => x.Aussage)
-                        .Select(grp => new FeedbackAussageErgebnis
-                        {
-                            Aussage = grp.Key,
-                            Antwortverteilung = grp
-                                .Where(x => x.BewertungsChar != null)
-                                .GroupBy(x => x.BewertungsChar)
-                                .ToDictionary(b => b.Key, b => b.Count())
-                        })
-                        .ToList()
-                })
-                .ToList();
+            FeedbackErgebnisse = await HoleEigeneFeedbacks(userGuid);
 
             return Page();
         }
 
+        private async Task<List<FeedbackErgebnisViewModel>> HoleEigeneFeedbacks(string userId)
+        {
+            var erstellungsDaten = await _context.Erstellung
+                .Where(e => e.UserID == userId)
+                .Include(e => e.Abteilung)
+                .Include(e => e.Klassen)
+                .Include(e => e.Fach)
+                .Include(e => e.Feedbackbogen)
+                .ToListAsync();
+
+            var erstellungsIds = erstellungsDaten.Select(e => e.ErstellungsID).ToList();
+
+            var ergebnisDaten = await _context.Ergebnisse
+                .Where(er => erstellungsIds.Contains(er.ErstellungsID))
+                .Include(er => er.Aussage)
+                .Include(er => er.Bewertung)
+                .ToListAsync();
+
+            var variableErgebnisDaten = await _context.Variable_Ergebnisse
+                .Where(v => erstellungsIds.Contains(v.ErstellungsID))
+                .Include(v => v.ExtraFeedback)
+                .ToListAsync();
+
+            return erstellungsDaten.Select(e => new FeedbackErgebnisViewModel
+            {
+                ErstellungsID = e.ErstellungsID,
+                FeedbackID = e.FeedbackID,
+                FeedbackTitel = $"{e.Abteilung.AbteilungName} - {e.Klassen.KlassenName} - {e.Fach.FachName} - {e.Erstellungsdatum.ToShortDateString()}",
+                FeedbackBeschreibung = e.Feedbackbogen.Beschreibung,
+                Erstellungsdatum = e.Erstellungsdatum,
+                Ergebnisse = ergebnisDaten
+                    .Where(er => er.ErstellungsID == e.ErstellungsID)
+                    .GroupBy(er => er.Aussage.Aussage)
+                    .Select(grp => new FeedbackAussageErgebnis
+                    {
+                        Aussage = grp.Key,
+                        Durchschnittswert = grp.Average(er => er.Bewertung.BewertungsInt),
+                        AnzahlAntworten = grp.Count()
+                    })
+                    .ToList(),
+                VariableErgebnisse = variableErgebnisDaten
+                    .Where(v => v.ErstellungsID == e.ErstellungsID)
+                    .Select(v => new FeedbackVariableErgebnis
+                    {
+                        Frage = v.ExtraFeedback.Frage,
+                        Antwort = v.AntwortUser
+                    })
+                    .ToList()
+            }).ToList();
+        }
 
 
 
-
-    }
-
-    public class FeedbackErgebnisViewModel
-    {
-        public int ErstellungsID { get; set; }
-        public string FeedbackTitel { get; set; }
-        public DateTime Erstellungsdatum { get; set; }
-        public List<FeedbackAussageErgebnis> Ergebnisse { get; set; } = new();
-    }
-
-    public class FeedbackAussageErgebnis
-    {
-        public string Aussage { get; set; }
-        public Dictionary<string, int> Antwortverteilung { get; set; } = new();
     }
 }

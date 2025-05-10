@@ -1,0 +1,65 @@
+﻿.curveWrap {
+    opacity: 1;
+    width: 150vw;
+    height: 100vh;
+    position: absolute;
+    transform: translateX(-30vw) rotate(0deg);
+    will-change: transform;
+}
+
+    .curveWrap .curve {
+        stroke-linecap: round;
+        stroke-opacity: 0;
+    }
+
+        .curveWrap .curve path {
+            transform-origin: center;
+        }
+
+            /* Path 1 */
+            .curveWrap .curve path:nth-child(1) {
+                stroke-width: 20px;
+                animation: curve 35s linear 1.6s infinite;
+                stroke: goldenrod;
+            }
+
+            /* Path 2 */
+            .curveWrap .curve path:nth-child(2) {
+                stroke-width: 25px;
+                animation: curve 35s linear 3.2s infinite;
+                stroke: cornflowerblue;
+            }
+
+            /* Path 3 */
+            .curveWrap .curve path:nth-child(3) {
+                stroke-width: 30px;
+                animation: curve 35s linear 4.8s infinite;
+                stroke: greenyellow;
+            }
+
+            /* Path 4 */
+            .curveWrap .curve path:nth-child(4) {
+                stroke-width: 22px;
+                animation: curve 35s linear 6.4s infinite;
+                stroke: lightblue;
+            }
+
+/* ✅ Wichtig: Keyframes müssen ganz oben oder unten separat stehen */
+@keyframes curve {
+    50% {
+        transform: rotateX(360deg) scaleY(1) skewY(8deg);
+        stroke-opacity: 1;
+    }
+}
+
+/* Layout */
+html,
+body {
+    height: 100vh;
+    overflow:hidden;
+}
+
+body {
+    background: radial-gradient(#222, #000);
+    background-repeat: no-repeat;
+}

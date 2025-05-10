@@ -10,15 +10,13 @@ public static class ProgramExtensions
     {
         using var scope = serviceProvider.CreateScope();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
         const string adminRole = "Admin";
 
-        // 1️⃣ Admin-Rolle prüfen und erstellen, falls nicht vorhanden
+        // Admin-Rolle prüfen und erstellen, falls nicht vorhanden
         if (!await roleManager.RoleExistsAsync(adminRole))
         {
             await roleManager.CreateAsync(new IdentityRole(adminRole));
-            logger.LogInformation("Admin-Rolle wurde erstellt.");
         }
     }
 }

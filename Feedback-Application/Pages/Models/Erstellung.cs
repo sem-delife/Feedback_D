@@ -35,6 +35,15 @@ namespace Feedback_Application.Pages.Models
         [Required]
         public DateTime Erstellungsdatum { get; set; } = DateTime.UtcNow; // Neues Feld mit Standardwert
 
+
+        // Navigationseigenschaften hinzufügen
+        public virtual Klassen Klassen { get; set; }
+        public virtual Abteilung Abteilung { get; set; }
+        public virtual Fach Fach { get; set; }
+        public virtual Feedbackbogen Feedbackbogen { get; set; }
+
+
+
         // Konstruktor (optional)
         public Erstellung()
         {

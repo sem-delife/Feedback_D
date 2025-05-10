@@ -23,12 +23,19 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
                     </ul>
+
+                    <!-- Dark Mode Toggle Button -->
+                    <button id="darkModeToggle" class="btn btn-outline-secondary me-3">
+                        🌙 Dark Mode
+                    </button>
+
                     <!-- Integration der _LoginPartial -->
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -44,7 +51,9 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/darkmode.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
